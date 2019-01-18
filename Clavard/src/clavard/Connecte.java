@@ -36,7 +36,6 @@ public class Connecte implements ActionListener, MouseListener, KeyListener {
 	private ArrayList<String> ListCo;
 	private JTextField textField;
 	private String recepteur;
-	private BDD connexion;
 	//private ArrayList<JTextArea> tabTextArea = new ArrayList<JTextArea>();
 	//private int j=0;
 	ArrayList<String> l_messages; 
@@ -47,7 +46,7 @@ public class Connecte implements ActionListener, MouseListener, KeyListener {
 	JPanel panel_4;
 	JList list;
 	Controller ctrl;
-	
+	DefaultListModel listModel;
 	
 	public Connecte(String log, Controller controller) {
 		ctrl=controller;
@@ -91,7 +90,7 @@ public class Connecte implements ActionListener, MouseListener, KeyListener {
 		JScrollPane scrollPane = new JScrollPane();
 		scrollPane.setBounds(0, 0, 228, 458);
 		scrollPane.setBorder(null);
-		DefaultListModel listModel = new DefaultListModel();
+		listModel = new DefaultListModel();
 		list = new JList(listModel);
 		list.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
 		list.setFont(new Font("Trebuchet MS", Font.PLAIN, 17));
@@ -193,8 +192,20 @@ public class Connecte implements ActionListener, MouseListener, KeyListener {
 		panel_4.add(scroll);
 		panel_3.setVisible(false);
 		
-		frmConnecte.setTitle("Connect�");
+		frmConnecte.setTitle("Connecté");
 		frmConnecte.setVisible(true);
+	}
+	
+	/* methode appelée quand un user se connecte
+	 * ou se deconnecte
+	 */
+	public void majListeCo() {
+		ListCo = ctrl.getListeCo();
+		listModel = new DefaultListModel();
+		for(String i : ListCo) {
+			listModel.addElement(i);
+		}
+		list.setModel(listModel);
 	}
 
 	public void afficheChat() throws ParseException {
@@ -340,4 +351,6 @@ public class Connecte implements ActionListener, MouseListener, KeyListener {
 			}
 	        }
 	}
+	
+	
 }
