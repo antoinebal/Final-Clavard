@@ -14,7 +14,6 @@ public class Controller {
 	private Connecte fenetreCo_;
 	private BDD connexion;
 	private String pseudo;
-	private boolean ready_=false;
 	
 	
 	/*
@@ -61,7 +60,7 @@ public class Controller {
 		
 		//on a la liste donc on peut créer la fenetre connecte
 		fenetreCo_ = new Connecte(pseudo, this);
-		ready_=true;
+
 	}
 	
 	/*fonction appelée depuis le Chat. Appelle envoyerMessage de
@@ -111,20 +110,16 @@ public class Controller {
 	 * la fenêtre Connecte de cela
 	 */
 	public void nouveauConnecte(String pseudo) {
-		if (ready_) {
 		ListeCo.add(pseudo);
 		fenetreCo_.majListeCo();
-		}
 	}
 	
 	/* méthode appelée par l'IR quand un contact se
 	 * déconnecte
 	 */
 	public void decoContact(String pseudo) {
-		if (ready_) {
 		ListeCo.remove(pseudo);
 		fenetreCo_.majListeCo();
-		}
 	}
 	
 	
