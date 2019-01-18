@@ -42,7 +42,7 @@ public class Controller {
 		}
 		
 		//on crée l'ir
-		ir_ = new InterfaceReseau(pseudo, 6000, 5000, this);
+		ir_ = new InterfaceReseau(pseudo, 6000, 5000);
 		
 		while (!ir_.isCo()) {
 			try {
@@ -103,23 +103,6 @@ public class Controller {
 	
 	public static void main(String[] args) {
 		new Controller();
-	}
-	
-	/* fonction à appeler depuis l'ir quand il y a
-	 * un nouveau connecté. Le controller va notifier 
-	 * la fenêtre Connecte de cela
-	 */
-	public void nouveauConnecte(String pseudo) {
-		ListeCo.add(pseudo);
-		fenetreCo_.majListeCo();
-	}
-	
-	/* méthode appelée par l'IR quand un contact se
-	 * déconnecte
-	 */
-	public void decoContact(String pseudo) {
-		ListeCo.remove(pseudo);
-		fenetreCo_.majListeCo();
 	}
 	
 	

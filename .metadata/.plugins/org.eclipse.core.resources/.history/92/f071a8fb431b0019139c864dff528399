@@ -42,7 +42,7 @@ public class Controller {
 		}
 		
 		//on crée l'ir
-		ir_ = new InterfaceReseau(pseudo, 6000, 5000, this);
+		ir_ = new InterfaceReseau(pseudo, 6000, 5000);
 		
 		while (!ir_.isCo()) {
 			try {

@@ -7,7 +7,6 @@ import java.util.HashMap;
 import java.net.InetAddress;
 import java.util.Timer;
 import java.util.TimerTask;
-import clavard.Controller;
 
 
 public class InterfaceReseau {
@@ -60,8 +59,6 @@ public class InterfaceReseau {
     /*TimerTask -> si on dépasse les 2 secondes sans être connecté (ie sans avoir reçu de welcome)
       -> on considère qu'on est le premier connecté -> connected passe à vrai */
     TTHello ttHello_;
-    
-    Controller controller_;
 
 
     //constructeur pour tester secrétaire
@@ -71,8 +68,8 @@ public class InterfaceReseau {
     }
 
     
-    public InterfaceReseau (String pseudo, int portServeur, int portUDP, Controller controller) {
-	controller_ = controller;
+    public InterfaceReseau (String pseudo, int portServeur, int portUDP) {
+	//controller_ = controller;
 	
 	annuaire_ = new HashMap<>();
 	pseudo_=pseudo;
@@ -172,26 +169,20 @@ public class InterfaceReseau {
 	    Correspondant nouveauCorrespondant = new Correspondant(bbTCP);
 	    annuaire_.put(pseudo, nouveauCorrespondant);
 	    System.out.println(pseudo+" ajouté à l'annuaire, son Hello n'avait pas été reçu.");
-	    
-	    //on informe le controller
-	    controller_.nouveauConnecte(pseudo);
 	}
     }
 
     //fonction à appeler par Secrétaire quand on reçoit un message Hello
     public void nouveauCorrespondant(String pseudo, InetAddress address, int port) throws CorrespondantException{
-		if (annuaire_.containsKey(pseudo)) {
-		    /*le pseudo est déjà dans l'annuaire : on lance une erreur, cela veut dire que 
-		      l'interlocuteur utilise un pseudo actif ou qu'il a envoyé plusieurs hello. */
-		    throw new CorrespondantException(pseudo+" venant d'envoyer un hello est déjà dans l'annuaire.");
-		} else {
-		    Correspondant nouveauCorrespondant = new Correspondant(address, port);
-		    annuaire_.put(pseudo, nouveauCorrespondant);
-		    System.out.println(pseudo+" ajouté à l'annuaire grâce à son message Hello.");
-		    
-		    //on informe le controller
-		    controller_.nouveauConnecte(pseudo);
-		}
+	if (annuaire_.containsKey(pseudo)) {
+	    /*le pseudo est déjà dans l'annuaire : on lance une erreur, cela veut dire que 
+	      l'interlocuteur utilise un pseudo actif ou qu'il a envoyé plusieurs hello. */
+	    throw new CorrespondantException(pseudo+" venant d'envoyer un hello est déjà dans l'annuaire.");
+	} else {
+	    Correspondant nouveauCorrespondant = new Correspondant(address, port);
+	    annuaire_.put(pseudo, nouveauCorrespondant);
+	    System.out.println(pseudo+" ajouté à l'annuaire grâce à son message Hello.");
+	}
     }
 
     //fonction à appeler depuis bbTCP quand on éteint l'ir ou quand il reçoît un msg TCP "tchao"
@@ -199,9 +190,6 @@ public class InterfaceReseau {
     public void supprimeCorrespondant(String pseudo) {
 	annuaire_.remove(pseudo);
 	printAnnuaire();
-	
-	//on informe le controller
-	controller_.decoContact(pseudo);
     }
 
     public String getPseudo() {return pseudo_;}
@@ -377,7 +365,37 @@ public class InterfaceReseau {
     }
 		
 
- 
+    
+    public static void main(String[] args) {
+    
+    		
+    		Scanner scan = new Scanner(System.in);
+    		String inputDest=null;
+    		String inputMsg=null;
+    		try {
+    			InterfaceReseau ir = new InterfaceReseau("maure", 5001, 6000);
+    			/*ir.addAnnuaire("mazak", InetAddress.getLocalHost(), 5000);
+    			ir.addAnnuaire("nualia", InetAddress.getLocalHost(), 5002);
+    			ir.printAnnuaire();	*/		
+    			while(true) {
+    			System.out.println("Qui contacter?");
+    			if (scan.hasNext()) {
+    				inputDest=scan.nextLine();
+    			}
+    			System.out.println("Quel message envoyer à "+inputDest);
+    			if (scan.hasNext()) {
+    				inputMsg=scan.nextLine();
+    			}
+    			ir.envoyerMessage(inputDest, inputMsg);
+    			}
+    		//} catch (UnknownHostException e) {
+    			//e.printStackTrace();
+    		} catch (CorrespondantException e) {
+    			e.printStackTrace();
+    		}
+    		
+        }
+
 	
 
 
