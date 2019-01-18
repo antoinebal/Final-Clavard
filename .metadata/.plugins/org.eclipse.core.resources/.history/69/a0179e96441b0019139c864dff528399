@@ -9,7 +9,7 @@ import reseau.InterfaceReseau;
 
 
 public class Controller {
-	private ArrayList<String> ListeCo = new ArrayList<String>();
+	private ArrayList<String> ListeCo;
 	private InterfaceReseau ir_;
 	private Connecte fenetreCo_;
 	private BDD connexion;
