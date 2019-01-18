@@ -143,8 +143,7 @@ public class InterfaceReseau {
     public void recevoirMessage(String pseudoEmetteur, String message) throws CorrespondantException{
 	if (annuaire_.containsKey(pseudoEmetteur)) {
 		System.out.println(pseudoEmetteur+" : "+message);
-		printAnnuaire();
-		controller_.recevoirMessage(pseudoEmetteur, message);
+		printAnnuaire();	
 	    } else {
 		throw new CorrespondantException("Reçu message d'un correspondant inconnu");
 	    }

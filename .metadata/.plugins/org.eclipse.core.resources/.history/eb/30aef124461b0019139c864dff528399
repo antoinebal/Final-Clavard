@@ -271,7 +271,6 @@ public class Connecte implements ActionListener, MouseListener, KeyListener {
 	
 	public void ajoutMessageRecu(String pseudoEmetteur, String message) {
 		if (recepteur.equals(pseudoEmetteur)) {
-			System.out.println(recepteur+"     "+pseudoEmetteur);
 			TextArea.append(recepteur+" : "+message+"\n");
 		}
 	}
