@@ -16,7 +16,7 @@ public class Testbdd {
     	System.out.println("Dans la fonction ecrire, apr�s le rechmgt : "+rechange);*/
 		
 		
-		BDD connexion = new BDD("/home/abalayss/clavard-workspace/Clavard/src/clavard/Clavard.db");
+		BDD connexion = new BDD("Clavard.db");
         connexion.connect();
         Date date = new Date();
         String pseudo1 = "Mehdi";

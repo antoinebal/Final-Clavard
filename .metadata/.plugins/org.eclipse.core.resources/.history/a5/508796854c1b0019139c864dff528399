@@ -75,7 +75,7 @@ public class Connecte implements ActionListener, MouseListener, KeyListener {
 		frmConnecte.getContentPane().add(panel);
 		panel.setLayout(null);
 		
-		JLabel lblNewLabel = new JLabel("Connecté(s) : "+nbCo);
+		JLabel lblNewLabel = new JLabel("Connect�(s) : "+nbCo);
 		lblNewLabel.setBounds(56, 103, 130, 23);
 		lblNewLabel.setFont(new Font("Book Antiqua", Font.BOLD, 18));
 		lblNewLabel.setForeground(Color.WHITE);
@@ -253,8 +253,8 @@ public class Connecte implements ActionListener, MouseListener, KeyListener {
 
    
 	public void envoi(String mess) {
-		/*Ecriture dans la base de données et refresh ?
-		 écrire BDD */
+		/*�criture dans la base de donn�es et refresh ?
+		 �crire BDD */
 		if(mess.isEmpty()) {
 		}
 		else {

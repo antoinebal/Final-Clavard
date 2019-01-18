@@ -22,7 +22,7 @@ public class Controller {
 		ListeCo = new ArrayList<String>();
 		ListeCo.add("Le Balayssac FR");
 		ListeCo.add("Sauveur Gascou");
-		ListeCo.add("théo");
+		ListeCo.add("th�o");
 		ListeCo.add("khalil");
 		ListeCo.add("Slim le S");
 		ListeCo.add("Mehdi");
@@ -42,7 +42,6 @@ public class Controller {
 			}
 		}
 		
-		
 		//on crée l'ir
 		ir_ = new InterfaceReseau(pseudo, 6000, 5000, this);
 		
@@ -57,7 +56,7 @@ public class Controller {
 		//on récupère la liste des connectés
 		ListeCo = ir_.annuaireToPseudoList();
 		
-		connexion = new BDD("/home/abalayss/clavard-workspace/Clavard/src/clavard/Clavard.db");
+		connexion = new BDD("Clavard.db");
         connexion.connect();
 		
 		//on a la liste donc on peut créer la fenetre connecte

@@ -8,15 +8,15 @@ public class Testbdd {
 
 	public static void main(String[] args) {
 		//InterfaceGraphique IG = new InterfaceGraphique();
-		/*String mess = "I'll be watching you 'k 'o";
+		String mess = "I'll be watching you 'k 'o";
 		System.out.println("Dans la fonction ecrire, avant le chmgt : "+mess);
     	String messrap = mess.replace("'", "\\\\");
     	System.out.println("Dans la fonction ecrire, apr�s le chmgt : "+messrap);
     	String rechange = messrap.replace("\\\\","'");
-    	System.out.println("Dans la fonction ecrire, apr�s le rechmgt : "+rechange);*/
+    	System.out.println("Dans la fonction ecrire, apr�s le rechmgt : "+rechange);
 		
 		
-		BDD connexion = new BDD("/home/abalayss/clavard-workspace/Clavard/src/clavard/Clavard.db");
+		/*BDD connexion = new BDD("Clavard.db");
         connexion.connect();
         Date date = new Date();
         String pseudo1 = "Mehdi";
@@ -40,7 +40,7 @@ public class Testbdd {
 			//System.out.println("Aucun message");
 		}
         connexion.close();
-
+*/
 	}
 
 }

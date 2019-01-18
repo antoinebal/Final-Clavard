@@ -166,8 +166,8 @@ public class InterfaceReseau {
 		annuaire_.get(pseudo).setBBTCP(bbTCP);
 		System.out.println(pseudo+" mis à jour dans l'annuaire, il y était déjà.");
 	    } catch (CorrespondantException e) {
-		//System.out.println("PB nouveau correspondant.");
-		//e.printStackTrace();
+		System.out.println("PB nouveau correspondant.");
+		e.printStackTrace();
 	    }
 	} else {
 	    Correspondant nouveauCorrespondant = new Correspondant(bbTCP);
