@@ -1,0 +1,402 @@
+package reseau;
+
+import java.util.Map;
+import java.util.Scanner;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.net.InetAddress;
+import java.util.Timer;
+import java.util.TimerTask;
+
+
+public class InterfaceReseau {
+
+    //Controller controller_;
+
+    /*associe les pseudos aux objets Correspondant*/
+    private Map<String, Correspondant> annuaire_;
+
+    //serveur TCP
+    private ServeurTCP serveur_;
+
+    //port d'écoute du serveur TCP
+    private int portServeur_;
+
+    //pseudo du user possédant l'ir
+    private String pseudo_;
+
+    //port d'écoute UDP
+    private int portUDP_;
+
+    //objet Runnable d'écoute UDP
+    private UDPListener udpListener_;
+
+    //objet pour envoyer des messages UDP
+    private UDPTalk udpTalk_;
+
+    //classe qui gère les messages UDP (administration du réseau)
+    private Secretaire secretaire_;
+
+    //connected_ passe à vrai quand l'interface réseau a des contacts
+    private boolean connected_;
+
+    /* vrai si on est le dernier connecté. Si on reçoit un message hello,
+       on envoie notre annuaire à l'émetteur et dernierCo passe à faux.*/
+    private boolean dernierCo_;
+
+    /* ce boolean est utile pour terminer le UDPListener : en effet,
+       comme son socket est bloqué sur un .receive, appeler sa méthode close
+       lèverait une exception. Ainsi, quand termine_ passe à faux, une fois
+       que son timeout sera terminé, UDPListener 
+       fermera ses sockets, sort de la boucle et termine son activité 
+       (c'est aussi utile pour le thread attend connexion de serveur, qui
+       reste bloqué sur une fonction accept)*/
+    private boolean termine_;
+
+    //timer utilisé pour la récéption de Hello
+    Timer timerHello_ = new Timer();
+
+    /*TimerTask -> si on dépasse les 2 secondes sans être connecté (ie sans avoir reçu de welcome)
+      -> on considère qu'on est le premier connecté -> connected passe à vrai */
+    TTHello ttHello_;
+
+
+    //constructeur pour tester secrétaire
+    InterfaceReseau(String pseudo) {
+	annuaire_ = new HashMap<>();
+	pseudo_=pseudo;
+    }
+
+    
+    public InterfaceReseau (String pseudo, int portServeur, int portUDP) {
+	//controller_ = controller;
+	
+	annuaire_ = new HashMap<>();
+	pseudo_=pseudo;
+
+	//config et lancement serveur
+	portServeur_=portServeur;
+	serveur_ = new ServeurTCP(portServeur_, this);
+	serveur_.startServer();
+
+	//booléens d'état
+	connected_=false;
+	dernierCo_=true;
+	termine_=false;
+
+	/*le secrétaire est l'assistant de l'interface réseau : il s'occupe
+	  d'écrire les messages qu'il demande et de traiter son courrier UDP (hello,
+	  tchao, changement de pseudo, welcome etc.) */
+	secretaire_=new Secretaire(this);
+
+	//config et lancement udpListener
+	portUDP_=portUDP;
+	udpListener_=new UDPListener(portUDP_, this);
+	Thread threadUDPListener = new Thread(udpListener_);
+	threadUDPListener.start();
+
+	udpTalk_ = new UDPTalk(portUDP_);
+
+	//on broadcast un hello message
+	udpTalk_.broadcastMessage(secretaire_.construireHelloMessage());
+	System.out.println("IR : Hello broadcasté");
+
+	//on lance le timer
+	ttHello_ = new TTHello(this);
+	timerHello_.scheduleAtFixedRate(ttHello_, 1000, 1000);
+    }
+
+    public void recevoirMessageUDP(InetAddress address, int port, String message) {
+	System.out.println("IR : Message UDP reçu, IR le passe au Secrétaire.");
+	secretaire_.traiteMessage(address, port, message);
+    }
+
+    public void envoyerUDP(InetAddress address, String message) {
+	udpTalk_.sendMessageUDP(message, address);
+    }
+
+    public void envoyerMessage (String pseudoDest, String message) throws CorrespondantException {
+	if (annuaire_.containsKey(pseudoDest)) {
+	    Correspondant corr = annuaire_.get(pseudoDest);
+	    if (corr.coEtablie()) {
+		corr.getBBTCP().envoyerMessage(message);
+	    } else {
+		//il faut créer un client
+		System.out.println("Destinataire "+pseudoDest+" trouvé, la co n'est pas établie, on lance le client.");
+		ClientTCP client = new ClientTCP(corr.getPort(), corr.getInetAddress(), this, pseudoDest);
+		client.startClient();
+		//annuaire_.get(pseudoDest).setBBTCP(client.getBBTCP());
+		corr.getBBTCP().envoyerMessage(message);
+	    }
+	} else {
+	    //il faut lancer un client
+	    throw new CorrespondantException("Ce destinataire est inconnu.");
+	}
+	printAnnuaire();	
+    }
+
+
+    /* appelé quand message TCP reçu -> TODO lien avec controller qui va update IG + BDD */
+    public void recevoirMessage(String pseudoEmetteur, String message) throws CorrespondantException{
+	if (annuaire_.containsKey(pseudoEmetteur)) {
+		System.out.println(pseudoEmetteur+" : "+message);
+		printAnnuaire();	
+	    } else {
+		throw new CorrespondantException("Reçu message d'un correspondant inconnu");
+	    }
+    }
+
+    /* cette fonction est appelée quand une connexion TCP est performée.
+       Si le correspondant est présent dans l'annuaire, (ce qui est normal, cela veut
+       dire que l'on avait reçu son hello), on set juste le blablaTCP pour discuter
+       avec lui dans son objet Correspondant.
+       Si le correspondant n'est pas présent dans l'annuaire, (cela veut dire
+       que l'on avait pas reçu son hello message, ce qui est possible comme
+       c'est un message d'administration réseau, donc UDP), on rajoute
+       une nouvelle entrée dans l'annuaire pour ce Correspondant crée avec
+       l'objet BlablaTCP du nouvel interlocuteur.*/
+    public void nouveauCorrespondant(String pseudo, BlablaTCP bbTCP) {
+	if (annuaire_.containsKey(pseudo)) {
+	    try {
+		//le correspondant était déjà présent dans l'annuaire grâce à son Hello
+		annuaire_.get(pseudo).setBBTCP(bbTCP);
+		System.out.println(pseudo+" mis à jour dans l'annuaire, il y était déjà.");
+	    } catch (CorrespondantException e) {
+		System.out.println("PB nouveau correspondant.");
+		e.printStackTrace();
+	    }
+	} else {
+	    Correspondant nouveauCorrespondant = new Correspondant(bbTCP);
+	    annuaire_.put(pseudo, nouveauCorrespondant);
+	    System.out.println(pseudo+" ajouté à l'annuaire, son Hello n'avait pas été reçu.");
+	}
+    }
+
+    //fonction à appeler par Secrétaire quand on reçoit un message Hello
+    public void nouveauCorrespondant(String pseudo, InetAddress address, int port) throws CorrespondantException{
+	if (annuaire_.containsKey(pseudo)) {
+	    /*le pseudo est déjà dans l'annuaire : on lance une erreur, cela veut dire que 
+	      l'interlocuteur utilise un pseudo actif ou qu'il a envoyé plusieurs hello. */
+	    throw new CorrespondantException(pseudo+" venant d'envoyer un hello est déjà dans l'annuaire.");
+	} else {
+	    Correspondant nouveauCorrespondant = new Correspondant(address, port);
+	    annuaire_.put(pseudo, nouveauCorrespondant);
+	    System.out.println(pseudo+" ajouté à l'annuaire grâce à son message Hello.");
+	}
+    }
+
+    //fonction à appeler depuis bbTCP quand on éteint l'ir ou quand il reçoît un msg TCP "tchao"
+    //supprime le Correspondant ayant pour clé le pseudo en argument
+    public void supprimeCorrespondant(String pseudo) {
+	annuaire_.remove(pseudo);
+	printAnnuaire();
+    }
+
+    public String getPseudo() {return pseudo_;}
+    public int getPort() {return portServeur_;}
+    public boolean isCo() {return connected_;}
+    public boolean dernierCo() {return dernierCo_;}
+    public boolean isTermine() {return termine_;}
+    public void setDernierCo(boolean b) {dernierCo_=b;}
+    public void setCo() {connected_=true;}
+
+    /*cette fonction est appelée par le secrétaire pour construire un message welcome*/
+    public String annuaireToString() {
+	String result = "";
+	for(Map.Entry<String, Correspondant> entry : annuaire_.entrySet()) {
+	    Correspondant corr = entry.getValue();
+	    if ((corr.getInetAddress()!=null)&&(corr.getPort()!=-1)) {
+		String pseudo = entry.getKey();
+		result=result+":"+pseudo+";"+corr.getInetAddress().toString()+";"+Integer.toString(corr.getPort());
+	    } 
+	}
+	return result;
+    }
+    
+    /*cette fonction est appelée par le secrétaire pour construire un message welcome*/
+    public ArrayList<String> annuaireToPseudoList() {
+	ArrayList<String> result = new ArrayList<String>();
+	for(Map.Entry<String, Correspondant> entry : annuaire_.entrySet()) {
+	    Correspondant corr = entry.getValue();
+	    if ((corr.getInetAddress()!=null)&&(corr.getPort()!=-1)) {
+		String pseudo = entry.getKey();
+		result.add(pseudo);
+	    } 
+	}
+	return result;
+    }
+
+    //ici fonctions pour le TEST
+    public void addAnnuaire(String pseudo, InetAddress address, int port) {
+	annuaire_.put(pseudo, new Correspondant(address, port));
+    }
+    public void printAnnuaire() {
+	System.out.println("Annuaire de "+pseudo_+" : ");
+	for(Map.Entry<String, Correspondant> entry : annuaire_.entrySet()) {
+	    String pseudo = entry.getKey();
+	    Correspondant corr = entry.getValue();
+	    System.out.println("Pseudo : "+pseudo);
+	    corr.print();
+	}
+    }
+
+
+    /*extinction s'occupe de terminer toutes les connexions
+      et de l'organisation du départ de cet utilisateur du projet.
+      Il se charge des actions suivantes : 
+      >extinction parcourt l'annuaire : 
+      pour chaque Correspondant, 
+      -si coActive, on envoie "tchao"
+      en TCP et on ferme le socket ; 
+      -sinon envoyer TchaoMessage en
+      UDP sur InetAddress que contient Correspondant
+      (si celui qui s'éteint est dernier co le premier de l'annuaire 
+      avec pas de connexion établie reçoit un tchao message spécial : avec un champ 1
+      cela signifie qu'il passe dernier connecté)
+      >termine le UDPTalk(fermer les sockets)
+      >(terminer les threads)
+      >passer termine_ à true, ce qui induira l'arrêt et la destruction
+      des sockets de UDPListener et Serveur, si ce n'est pas déjà fait pas
+      leurs timeout respéctifs*/
+    public void extinction() {
+	System.out.println("IR : EXTINCTION");
+	for(Map.Entry<String, Correspondant> entry : annuaire_.entrySet()) {
+	    String pseudo = entry.getKey();
+	    Correspondant corr = entry.getValue();
+	    if (corr.coEtablie()) { //on termine les connexions BlablaTCP
+		corr.getBBTCP().envoyerTchao(dernierCo());
+		corr.getBBTCP().terminerConnexion(false);
+		System.out.println("IR : (ext) connexion terminée avec "+pseudo);
+	    } else { //on envoie tchaoMessage sur l'InetAddress du Correspondant
+		envoyerUDP(corr.getInetAddress(), secretaire_.construireTchaoMessage(dernierCo()));
+		System.out.println("IR : (ext) tchao UDP envoyé à "+pseudo);
+	    }
+	    setDernierCo(false);
+	}
+	annuaire_.clear();
+	System.out.println("IR : ANNUAIRE VIDÉ, CONNEXIONS FERMÉES");
+	printAnnuaire();
+
+	//on termine le UDPTalk
+	udpTalk_.terminer();
+		
+	termine_=true;
+    }
+
+
+    /*public static class CorrespondantException extends Exception {
+	public CorrespondantException(String s) {
+	    System.out.println(s);
+	}
+	}*/
+    private static class Correspondant {
+	//vrai si il y a une connexion établie avec le client (blablaTCP valide)
+	private boolean coEtablie_;
+	private InetAddress address_;
+	private int port_;
+	private BlablaTCP bbTCP_;
+
+	/* constructeur à appeler si le Correspondant
+	   n'est pas dans l'annuaire lors de son ajout */
+	Correspondant(BlablaTCP bbTCP) {
+	    bbTCP_=bbTCP;
+	    coEtablie_=true;
+	    port_=-1; //port non rempli
+	}
+
+	/* constructeur à appeler quand on reçoit le Hello
+	   du correspondant, on quand on est informé de la table
+	   des connectés à notre arrivée */
+	Correspondant(InetAddress address, int port) {
+	    address_=address;
+	    port_=port;
+	    coEtablie_=false;
+	}
+
+	public void setBBTCP(BlablaTCP bbTCP) throws CorrespondantException{
+	    if (coEtablie_) {
+		throw new CorrespondantException("Connexion déjà établie");
+	    } else {
+		bbTCP_ = bbTCP;
+		coEtablie_=true;
+	    }
+	}
+
+	public BlablaTCP getBBTCP() {return bbTCP_;}
+	public boolean coEtablie() {return coEtablie_;}
+	public InetAddress getInetAddress() {return address_;}
+	public int getPort() {return port_;}
+	public void print() {
+	    if (coEtablie_) {
+		System.out.println("Co etablie avec "+bbTCP_.getPseudoCo());
+	    } else {
+		System.out.println("Pas de co etablie sur port "+port_);
+	    }
+	}
+    }
+
+
+    /*cette classe est utile pour paraméter l'envoi des hello.
+      Si on n'a pas reçu de welcome au bout de 3 secondes, on 
+      considère que l'on est le premier connecté*/
+    private static class TTHello extends TimerTask {
+	private int secondes_=0;
+	private InterfaceReseau ir_;
+	public TTHello(InterfaceReseau ir) {
+	    super();
+	    ir_=ir;
+	}
+	public void run() {
+	    secondes_++;
+	    System.out.println("TTHello secondes : "+secondes_);
+	    if (ir_.isCo()) {
+		//si ir connecté on arrête la timer task
+		System.out.println("TTHello s'arrête car on est co");
+		cancel();
+	    }
+	    if (secondes_>2) {
+		//on considère qu'on est les premiers connectés
+		//on se set connecté et on arrête la timer task
+		System.out.println("TTHello passe ir en co : on est les premiers co");
+		ir_.setCo();
+		cancel();
+	    }
+	}
+    }
+		
+
+    
+    public static void main(String[] args) {
+    
+    		
+    		Scanner scan = new Scanner(System.in);
+    		String inputDest=null;
+    		String inputMsg=null;
+    		try {
+    			InterfaceReseau ir = new InterfaceReseau("maure", 5001, 6000);
+    			/*ir.addAnnuaire("mazak", InetAddress.getLocalHost(), 5000);
+    			ir.addAnnuaire("nualia", InetAddress.getLocalHost(), 5002);
+    			ir.printAnnuaire();	*/		
+    			while(true) {
+    			System.out.println("Qui contacter?");
+    			if (scan.hasNext()) {
+    				inputDest=scan.nextLine();
+    			}
+    			System.out.println("Quel message envoyer à "+inputDest);
+    			if (scan.hasNext()) {
+    				inputMsg=scan.nextLine();
+    			}
+    			ir.envoyerMessage(inputDest, inputMsg);
+    			}
+    		//} catch (UnknownHostException e) {
+    			//e.printStackTrace();
+    		} catch (CorrespondantException e) {
+    			e.printStackTrace();
+    		}
+    		
+        }
+
+	
+
+
+}

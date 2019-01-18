@@ -1,0 +1,36 @@
+package clavard;
+
+import java.util.ArrayList;
+import reseau.InterfaceReseau;
+
+
+public class Controller {
+	private ArrayList<String> ListeCo;
+	
+	private InterfaceReseau ir_;
+	
+	
+	/*
+	public Controller() {
+		ListeCo = new ArrayList<String>();
+		ListeCo.add("Le Balayssac FR");
+		ListeCo.add("Sauveur Gascou");
+		ListeCo.add("th�o");
+		ListeCo.add("khalil");
+		ListeCo.add("Slim le S");
+		ListeCo.add("Mehdi");
+	}*/
+	
+	public Controller() {
+		new Accueil();
+	}
+	
+	public ArrayList<String> getListeCo() {
+		return ListeCo;
+	}
+
+	public void setListeCo(ArrayList<String> listeCo) {
+		ListeCo = listeCo;
+	}
+	
+}

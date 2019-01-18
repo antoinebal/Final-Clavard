@@ -1,0 +1,110 @@
+package clavard;
+
+import java.text.ParseException;
+import java.util.ArrayList;
+import java.util.Date;
+
+import reseau.CorrespondantException;
+import reseau.InterfaceReseau;
+
+
+public class Controller {
+	private ArrayList<String> ListeCo;
+	private InterfaceReseau ir_;
+	private Connecte fenetreCo_;
+	private BDD connexion;
+	private String pseudo;
+	
+	
+	/*
+	public Controller() {
+		ListeCo = new ArrayList<String>();
+		ListeCo.add("Le Balayssac FR");
+		ListeCo.add("Sauveur Gascou");
+		ListeCo.add("th�o");
+		ListeCo.add("khalil");
+		ListeCo.add("Slim le S");
+		ListeCo.add("Mehdi");
+	}*/
+	
+	public Controller() {
+		
+		//fenêtre d'authentification
+		Accueil accueil = new Accueil();
+		
+		//on récupère le pseudo
+		while ((pseudo=accueil.getLog())==null) {
+			try {
+				Thread.sleep(500);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		}
+		
+		//on crée l'ir
+		ir_ = new InterfaceReseau(pseudo, 6000, 5000);
+		
+		while (!ir_.isCo()) {
+			try {
+				Thread.sleep(200);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		}
+		
+		//on récupère la liste des connectés
+		ListeCo = ir_.annuaireToPseudoList();
+		
+		connexion = new BDD("Clavard.db");
+        connexion.connect();
+		
+		//on a la liste donc on peut créer la fenetre connecte
+		fenetreCo_ = new Connecte(pseudo, this);
+
+	}
+	
+	/*fonction appelée depuis le Chat. Appelle envoyerMessage de
+	 * InterfaceReseau
+	 */
+	public void envoyerMessage(String pseudoDest, String message) {
+		try {
+			ir_.envoyerMessage(pseudoDest, message);
+		} catch (CorrespondantException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	public ArrayList<String> getListeCo() {
+		return ListeCo;
+	}
+
+	public void setListeCo(ArrayList<String> listeCo) {
+		ListeCo = listeCo;
+	}
+	
+	public void recevoirMessage(String pseudoEmetteur, String message) {
+		ecrireBDD(pseudoEmetteur, pseudo, new Date(), message);
+		fenetreCo_.ajoutMessageRecu(pseudoEmetteur, message);
+	}
+	
+	public void ecrireBDD(String login_emet,String login_recept,Date date,String mess) {
+		connexion.ecrire(login_emet, login_recept, date, mess);
+	}
+	
+	public ArrayList<Message> lireBDD(String login_emet,String login_recept) {
+		try {
+			return connexion.lire_mess(login_emet, login_recept);
+		} catch (ParseException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return new ArrayList<Message>();
+	}
+	
+	public static void main(String[] args) {
+		new Controller();
+	}
+	
+	
+	
+}

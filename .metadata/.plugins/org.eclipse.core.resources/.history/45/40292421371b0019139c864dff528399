@@ -1,0 +1,67 @@
+package clavard;
+
+import java.util.ArrayList;
+import reseau.InterfaceReseau;
+
+
+public class Controller {
+	private ArrayList<String> ListeCo;
+	private InterfaceReseau ir_;
+	private Connecte fenetreCo_;
+	
+	
+	/*
+	public Controller() {
+		ListeCo = new ArrayList<String>();
+		ListeCo.add("Le Balayssac FR");
+		ListeCo.add("Sauveur Gascou");
+		ListeCo.add("th�o");
+		ListeCo.add("khalil");
+		ListeCo.add("Slim le S");
+		ListeCo.add("Mehdi");
+	}*/
+	
+	public Controller() {
+		
+		//fenêtre d'authentification
+		Accueil accueil = new Accueil();
+		
+		//on récupère le pseudo
+		String pseudo;
+		while ((pseudo=accueil.getPseudo())==null) {
+			try {
+				Thread.sleep(500);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		}
+		
+		//on crée l'ir
+		ir_ = new InterfaceReseau(pseudo, 6000, 5000);
+		
+		while (!ir_.isCo()) {
+			try {
+				Thread.sleep(200);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		}
+		
+		//on récupère la liste des connectés
+		ListeCo = ir_.annuaireToPseudoList();
+		
+		//on a la liste donc on peut créer la fenetre connecte
+		fenetreCo_ = new Connecte(pseudo);
+		
+		
+	}
+	
+	public ArrayList<String> getListeCo() {
+		return ListeCo;
+	}
+
+	public void setListeCo(ArrayList<String> listeCo) {
+		ListeCo = listeCo;
+	}
+	
+}
