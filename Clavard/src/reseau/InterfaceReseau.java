@@ -220,8 +220,11 @@ public class InterfaceReseau {
 	    Correspondant corr = entry.getValue();
 	    if ((corr.getInetAddress()!=null)&&(corr.getPort()!=-1)) {
 		String pseudo = entry.getKey();
-		result=result+":"+pseudo+";"+corr.getInetAddress().toString()+";"+Integer.toString(corr.getPort());
+		String stringAdresse = corr.getInetAddress().toString().replace("/", "");
+		result=result+":"+pseudo+";"+stringAdresse+";"+Integer.toString(corr.getPort());
+		System.out.println("IR annuaire to String, adresse de "+pseudo+" stockée "+corr.getInetAddress().toString());
 	    } 
+	    
 	}
 	return result;
     }
