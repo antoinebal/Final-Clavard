@@ -103,6 +103,19 @@ public class Controller {
 		return new ArrayList<Message>();
 	}
 	
+	/*appelée quand l'utilisateur ferme la fenêtre : 
+	 * il faut close la bdd et éteindre l'IR
+	 */
+	public void fermer() {
+		connexion.close();
+		ir_.extinction();
+	}
+	
+	/* méthode appelée par l'IR quand un contact se
+	 * déconnecte
+	 */
+	
+	
 	public static void main(String[] args) {
 		new Controller();
 	}
@@ -124,6 +137,9 @@ public class Controller {
 	public void decoContact(String pseudo) {
 		if (ready_) {
 		ListeCo.remove(pseudo);
+		if (pseudo.equals(fenetreCo_.getRecepteur())) {
+			fenetreCo_.cacherChat();
+		}
 		fenetreCo_.majListeCo();
 		}
 	}

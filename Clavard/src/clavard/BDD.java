@@ -75,7 +75,10 @@ public class BDD {
     	String messrplcd = mess.replace("'", "\\\\");
     	
 
-    	ResultSet v = query("INSERT INTO messages(loginemetteur,loginrecepteur, date, mess) VALUES ( '" +emetrplcd+"','"+receptrplcd+"','"+strDate+"','"+messrplcd+"')");
+    	
+    	query("INSERT INTO messages(loginemetteur,loginrecepteur, date, mess) VALUES ( '" +emetrplcd+"','"+receptrplcd+"','"+strDate+"','"+messrplcd+"')");
+    	
+    	
     	System.out.println("BDD : JE VIENS DE QUERY, voici la liste des messages dans la bdd");
     	try {
 			ArrayList<Message> testPrint = this.lire_mess(login_emet, login_recept);
@@ -126,7 +129,7 @@ public class BDD {
         try {
             resultat = statement.executeQuery(requet);
         } catch (SQLException e) {
-            e.printStackTrace();
+            //e.printStackTrace();
             
         	//System.out.println("Erreur dans la requête : " + requet);
         }

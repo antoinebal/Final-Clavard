@@ -9,6 +9,8 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Date;
@@ -66,6 +68,15 @@ public class Connecte implements ActionListener, MouseListener, KeyListener {
 		frmConnecte.setBackground(new Color(0, 0, 0));
 		frmConnecte.setBounds(100, 100, 1080, 720);
 		frmConnecte.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		frmConnecte.addWindowListener(new WindowAdapter(){
+		    @Override
+		    public void windowClosing(WindowEvent e)
+		    {
+		        super.windowClosing(e);
+		        // Do your disconnect from the DB here.
+		        ctrl.fermer();
+		    }
+		});
 		frmConnecte.getContentPane().setLayout(null);
 		
 		JPanel panel = new JPanel();
@@ -269,13 +280,35 @@ public class Connecte implements ActionListener, MouseListener, KeyListener {
 		}
 	}
 	
+	/* si on veut rajouter des notifs, le faire ici */
 	public void ajoutMessageRecu(String pseudoEmetteur, String message) {
+		try {
 		if (recepteur.equals(pseudoEmetteur)) {
 			System.out.println(recepteur+"     "+pseudoEmetteur);
 			TextArea.append(recepteur+" : "+message+"\n");
 		}
+		} catch (NullPointerException e) {
+			System.out.println("Connecte : La fenêtre de discussion ouverte ne correspond pas au récépteur du message reçu");
+			recepteur=pseudoEmetteur;
+			try {
+				afficheChat();
+			} catch (ParseException e1) {
+				e1.printStackTrace();
+			}
+		}
+		
+	}
+	
+	public void cacherChat() {
+		panel_3.setVisible(false);
+		recepteur=null;
 	}
    
+	public String getRecepteur() {
+		return recepteur;
+	}
+
+
 	@Override
 	public void actionPerformed(ActionEvent arg0) {
 		// TODO Auto-generated method stub
