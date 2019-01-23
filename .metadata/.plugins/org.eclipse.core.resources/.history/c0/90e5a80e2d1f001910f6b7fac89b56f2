@@ -155,9 +155,9 @@ public class Controller {
 		connexion.changementPseudo(previousPseudo, newPseudo);
 		
 		//on màj l'ig
-		ListeCo.remove(previousPseudo);
-		ListeCo.add(newPseudo);
-		fenetreCo_.majListeCo();
+		int index = ListeCo.indexOf(previousPseudo);
+		ListeCo.set(index, newPseudo);
+		
 	}
 	
 	public void changementPseudo(String newPseudo) {

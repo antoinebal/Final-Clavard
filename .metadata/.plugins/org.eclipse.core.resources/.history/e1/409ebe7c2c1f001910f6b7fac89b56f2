@@ -300,7 +300,6 @@ public class InterfaceReseau {
 	    annuaire_.put(newPseudo, corr);
 	    System.out.println("IR : ANNUAIRE APRES SUPPRESSION");
 	    printAnnuaire();
-	    controller_.traiterNewPseudo(previousPseudo, newPseudo);
 	}
     }
 

@@ -88,7 +88,7 @@ public class Connecte implements ActionListener, MouseListener, KeyListener {
 		frmConnecte.getContentPane().add(panel);
 		panel.setLayout(null);
 		
-		JLabel lblNewLabel = new JLabel("Connectï¿½(s) : "+nbCo);
+		JLabel lblNewLabel = new JLabel("Connecté(s) : "+nbCo);
 		lblNewLabel.setBounds(56, 103, 130, 23);
 		lblNewLabel.setFont(new Font("Book Antiqua", Font.BOLD, 18));
 		lblNewLabel.setForeground(Color.WHITE);
@@ -210,7 +210,6 @@ public class Connecte implements ActionListener, MouseListener, KeyListener {
 				JOptionPane jop = new JOptionPane();
 			    login = jop.showInputDialog(null, "Votre nouveau pseudo ?", "Changer pseudo", JOptionPane.QUESTION_MESSAGE);
 			    lblNewLabel_1.setText("Bonjour "+login+" !");
-			    ctrl.changementPseudo(login);
 			}
 		});
 		btnChangerDePseudo.setBackground(Color.LIGHT_GRAY);
@@ -219,11 +218,11 @@ public class Connecte implements ActionListener, MouseListener, KeyListener {
 		panel_1.add(btnChangerDePseudo);
 		panel_3.setVisible(false);
 		
-		frmConnecte.setTitle("Connectï¿½");
+		frmConnecte.setTitle("Connecté");
 		frmConnecte.setVisible(true);
 	}
 	
-	/* methode appelï¿½e quand un user se connecte
+	/* methode appelée quand un user se connecte
 	 * ou se deconnecte
 	 */
 	public void majListeCo() {
@@ -280,8 +279,8 @@ public class Connecte implements ActionListener, MouseListener, KeyListener {
 
    
 	public void envoi(String mess) {
-		/*Ecriture dans la base de donnï¿½es et refresh ?
-		 ï¿½crire BDD */
+		/*Ecriture dans la base de données et refresh ?
+		 écrire BDD */
 		if(mess.isEmpty()) {
 		}
 		else {
@@ -304,7 +303,7 @@ public class Connecte implements ActionListener, MouseListener, KeyListener {
 			TextArea.append(recepteur+" : "+message+"\n");
 		}
 		} catch (NullPointerException e) {
-			System.out.println("Connecte : La fenï¿½tre de discussion ouverte ne correspond pas au rï¿½cï¿½pteur du message reï¿½u");
+			System.out.println("Connecte : La fenêtre de discussion ouverte ne correspond pas au récépteur du message reçu");
 			recepteur=pseudoEmetteur;
 			try {
 				afficheChat();

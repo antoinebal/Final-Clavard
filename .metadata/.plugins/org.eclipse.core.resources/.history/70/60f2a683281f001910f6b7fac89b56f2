@@ -73,9 +73,12 @@ public class BDD {
     	String receptrplcd = login_recept.replace("'", "\\\\");
     	
     	String messrplcd = mess.replace("'", "\\\\");
-    		
+    	
+
+    	
     	query("INSERT INTO messages(loginemetteur,loginrecepteur, date, mess) VALUES ( '" +emetrplcd+"','"+receptrplcd+"','"+strDate+"','"+messrplcd+"')");
-    	  	
+    	
+    	
     	System.out.println("BDD : JE VIENS DE QUERY, voici la liste des messages dans la bdd");
     	try {
 			ArrayList<Message> testPrint = this.lire_mess(login_emet, login_recept);

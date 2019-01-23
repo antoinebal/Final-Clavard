@@ -157,7 +157,6 @@ public class Controller {
 		//on màj l'ig
 		ListeCo.remove(previousPseudo);
 		ListeCo.add(newPseudo);
-		fenetreCo_.majListeCo();
 	}
 	
 	public void changementPseudo(String newPseudo) {
