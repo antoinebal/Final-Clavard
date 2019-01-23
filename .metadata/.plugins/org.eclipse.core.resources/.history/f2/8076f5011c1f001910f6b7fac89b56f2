@@ -144,19 +144,6 @@ public class Controller {
 		}
 	}
 	
-	/*fonction appelée depuis l'IR, on : 
-	 * > màj la BDD
-	 * > màj l'interface graphique
-	 */
-	public void traiterNewPseudo(String previousPseudo, String newPseudo) {
-		System.out.println("Controller : "+previousPseudo+" s'appelle désormais "+newPseudo);
-		
-		//on màj la bdd
-		connexion.changementPseudo(previousPseudo, newPseudo);
-		
-		//on màj l'ig
-	}
-	
 	
 	
 }

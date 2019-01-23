@@ -212,10 +212,6 @@ public class InterfaceReseau {
     public boolean isTermine() {return termine_;}
     public void setDernierCo(boolean b) {dernierCo_=b;}
     public void setCo() {connected_=true;}
-    public void setPseudo(String pseudo) {
-	System.out.println("IR : je change de pseudo "+pseudo_+" --> "+pseudo);
-	pseudo_=pseudo;
-    }
 
     /*cette fonction est appelée par le secrétaire pour construire un message welcome*/
     public String annuaireToString() {
@@ -246,13 +242,6 @@ public class InterfaceReseau {
 	return result;
     }
 
-    /*fonction utilisée par le secrétaire pour vérifier si un pseudo appartient
-      à l'annuaire */
-    public boolean dejaPris(String pseudo) {
-	return annuaire_.containsKey(pseudo);
-    }
-
-
     //ici fonctions pour le TEST
     public void addAnnuaire(String pseudo, InetAddress address, int port) {
 	annuaire_.put(pseudo, new Correspondant(address, port));
@@ -264,42 +253,6 @@ public class InterfaceReseau {
 	    Correspondant corr = entry.getValue();
 	    System.out.println("Pseudo : "+pseudo);
 	    corr.print();
-	}
-    }
-
-
-    /* fonction appelée depuis le controller quand l'utilisateur change de pseudo.
-       Le pseudo est censé être validé en amont, mais si celui-ci existe déjà au moment
-       de l'appel de cette fonction, on lance une CorrespondantException */
-    public void informerNewPseudo(String newPseudo) throws CorrespondantException {
-	if (dejaPris(newPseudo)) {
-	    throw new CorrespondantException("Le nouveau pseudo "+newPseudo+" est déjà pris.");
-	} else  {
-	    //on broadcaste le message de changement de pseudo
-	    udpTalk_.broadcastMessage(secretaire_.construireNewPseudoMessage(newPseudo));
-
-	    //on change le pseudo enregistré dans l'ir
-	    pseudo_=newPseudo;
-	}
-    }
-
-    /* fonction appelée depuis le secrétaire, l'IR doit : 
-       > lever une exception si le pseudo existe déjà
-       > lever une exception si l'ancien pseudo n'existe pas
-       > changer l'annuaire
-       > informer le controller. */
-    public void traiterNewPseudo(String previousPseudo, String newPseudo) throws CorrespondantException{
-	if (dejaPris(newPseudo)||newPseudo.equals(getPseudo())) {
-	    throw new CorrespondantException("Le nouveau pseudo "+newPseudo+" est déjà pris.");
-	} else if (!dejaPris(previousPseudo)) {
-	    throw new CorrespondantException("Le précédent pseudo "+previousPseudo+" est inconnu.");
-	} else {
-	    Correspondant corr = annuaire_.get(previousPseudo);
-	    corr.setPseudo(newPseudo);
-	    supprimeCorrespondant(previousPseudo);
-	    annuaire_.put(newPseudo, corr);
-	    System.out.println("IR : ANNUAIRE APRES SUPPRESSION");
-	    printAnnuaire();
 	}
     }
 
@@ -382,12 +335,6 @@ public class InterfaceReseau {
 	    } else {
 		bbTCP_ = bbTCP;
 		coEtablie_=true;
-	    }
-	}
-
-	public void setPseudo(String newPseudo) {
-	    if (coEtablie_) {
-		bbTCP_.setPseudoCo(newPseudo);
 	    }
 	}
 

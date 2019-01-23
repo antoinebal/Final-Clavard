@@ -100,11 +100,6 @@ public class BlablaTCP {
 	System.out.println("BBTCP : dernierCo passé à vrai");
     }
 
-    public void setPseudoCo(String newPseudo) {
-	pseudoCorrespondant_=newPseudo;
-	System.out.println("BlablaTCP : pseudo changé en "+newPseudo);
-    }
-    
     public String getPseudoCo() {return pseudoCorrespondant_;}
 
 

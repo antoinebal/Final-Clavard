@@ -55,19 +55,11 @@ public class Secretaire {
 	return "";
     }
 
-
-    /* l'argument pseudoAffecte est le pseudo que doit prendre le nouveau co.
-       Si celui choisi par le nouveau connecté au début est disponible, il est égal à pseudoAffecte.
-       Sinon, pseudoAffecte est un nouveau pseudo (souvent de la forme pseudoOriginel1) que le nouveau
-       connecté devra adopter */
-    public String construireWelcomeMessage(String pseudoAffecte) {	
+    
+    public String construireWelcomeMessage() {	
 	String stringAnnuaire = ir_.annuaireToString();
 	String stringLocal = ir_.getPseudo()+";"+retourneIPLocale()+";"+Integer.toString(ir_.getPort());
-	return ir_.getPseudo()+":"+pseudoAffecte+":welcome"+stringAnnuaire+":"+stringLocal;
-    }
-
-    public String construireNewPseudoMessage(String newPseudo) {
-	return ir_.getPseudo()+":newpseudo:"+newPseudo;
+	return ir_.getPseudo()+":welcome"+stringAnnuaire+":"+stringLocal;
     }
     
     
@@ -83,22 +75,12 @@ public class Secretaire {
 	    String vieuxPseudo=message.split(":")[0];
 	    String nouveauPseudo=message.split(":")[2];
 	    System.out.println("Secrétaire : "+message+" est un message de changement de pseudo : "+vieuxPseudo+" devient "+nouveauPseudo+".");
-	    traiteNewPseudoMessage(message);
-	} else if (Pattern.matches(".+:.+:welcome:.+", message)) {
+	} else if (Pattern.matches(".+:welcome:.+", message)) {
 	    String pseudo=message.split(":")[0];
 	    System.out.println("Secrétaire : "+message+" est un message Welcome de "+pseudo+".");
 	    traiteWelcomeMessage(message);
 	} else {
 	    System.out.println("Secrétaire : "+message+" est non conforme.");
-	}
-    }
-
-    /* fonction récursive qui retourne un pseudo disponible */
-    public String pseudoDisponible(String pseudo, int tail) {
-	if (ir_.dejaPris(pseudo+tail)||(ir_.getPseudo().equals(pseudo+tail))) {
-	    return pseudoDisponible(pseudo, tail+1);
-	} else {
-	    return pseudo+tail;
 	}
     }
 
@@ -108,22 +90,14 @@ public class Secretaire {
 	try {
 	    //rajouter la condition avec le dernier co
 	    String pseudo=helloMsg.split(":")[0];
-	    /*on rentre dans ce cas si ce message hello est issu de notre propre
-	      broadcast */
-	    if (pseudo.equals(ir_.getPseudo())&&(!ir_.isCo())) {
-		System.out.println("Secrétaire : l'émetteur de ce hello est nous meme, on ignore");
+	    if (pseudo.equals(ir_.getPseudo())) {
+		System.out.println("Secrétaire : l'émetteur est nous meme, on ignore");
 	    } else {
 		System.out.println("Secrétaire : "+helloMsg+" est un message Hello de "+pseudo+".");
-		/* si le pseudo est déjà pris, on cherche un pseudo disponible à
-		   attribuer au nouveau connecté */
-		if (ir_.dejaPris(pseudo)) {
-		    pseudo=pseudoDisponible(pseudo, 0);
-		}
-		/*si on est le dernier connecté, on envoie notre annuaire au nouveau co, 
-		  et on lui spécifie son nouveau pseudo */
+		//si on est le dernier connecté, on envoie notre annuaire au nouveau co
 		if (ir_.dernierCo()) {
 		    System.out.println("Secrétaire: je suis le dernier co");
-		    ir_.envoyerUDP(address, construireWelcomeMessage(pseudo));
+		    ir_.envoyerUDP(address, construireWelcomeMessage());
 		    //on n'est plus le dernier connecté
 		    ir_.setDernierCo(false);
 		    System.out.println("Secrétaire: welcome envoyé, dernier co = false");
@@ -138,25 +112,16 @@ public class Secretaire {
 	
     }
 
-    /*welcomeMsg de la forme : pseudoEmetteur:pseudoAffecte:welcome:pseudo1;adresse1;port1:pseudo2;adresse2;port2 ... */
+    /*welcomeMsg de la forme : pseudoEmetteur:welcome:pseudo1;adresse1;port1:pseudo2;adresse2;port2 ... */
     //ATTENTION : L'EMETTEUR DE WELCOME DOIT S'INCLURE DANS LA LISTE AU MÊME TITRE QUE LES AUTRES
     public void traiteWelcomeMessage(String welcomeMsg) {
 	try {
 	    System.out.println("LISTE DES CONNECTES :");
 	    String[] firstSplit = welcomeMsg.split(":");
-	    String pseudoEm=firstSplit[0];
+	    String pseudoEm=firstSplit[1];
 	    System.out.println("Secrétaire : "+welcomeMsg+" est un message welcome de "+pseudoEm+".");
-	    
-	    String pseudoAffecte=firstSplit[1];
-	    /*si jamais notre pseudo était indispo, on prend pseudoAffecte
-	      comme nouveau pseudo */
-	    if (!pseudoAffecte.equals(ir_.getPseudo())) {
-		System.out.println("Secrétaire : "+ir_.getPseudo()+" indisponible, je m'appelle maintenant "+pseudoAffecte);
-		ir_.setPseudo(pseudoAffecte);
-	    }
-
-	    //on commence à 3 car les trois premiers champs sont pseudosEm, pseudoAff et welcome
-	    for(int NO=3 ; NO < firstSplit.length ; NO++) {
+	    //on commence à 2 car les deux premiers champs sont pseudo et message
+	    for(int NO=2 ; NO < firstSplit.length ; NO++) {
 		String[] secondSplit = firstSplit[NO].split(";");
 		String pseudo = secondSplit[0];
 		InetAddress address = InetAddress.getByName(secondSplit[1]);
@@ -166,7 +131,7 @@ public class Secretaire {
 	    }
 	    //on passe l'interface à l'état connecté : elle a reçu des contacts
 	    ir_.setCo();
-	    
+  
 	    //TEST on imprime l'annuaire
 	    ir_.printAnnuaire();
 	} catch (UnknownHostException e) {
@@ -190,25 +155,6 @@ public class Secretaire {
 	     System.out.println("Secrétaire : on passe dernier co.");
 	 }
     }
-
-    /* on informe l'IR de ce changement, qui va 
-       > lever une exception si le pseudo existe déjà
-       > lever une exception si l'ancien pseudo n'existe pas
-       > changer l'annuaire
-       > informer le controller. */
-    public void traiteNewPseudoMessage(String newPseudoMsg) {
-	String previousPseudo=newPseudoMsg.split(":")[0];
-	String newPseudo=newPseudoMsg.split(":")[2];
-	if (previousPseudo.equals(ir_.getPseudo())||(newPseudo.equals(ir_.getPseudo()))) {
-	    System.out.println("Secrétaire : l'émetteur de ce newpseudo est nous meme, on ignore");
-	} else {
-	    try {
-		ir_.traiterNewPseudo(previousPseudo, newPseudo);
-	    } catch (CorrespondantException e) {
-		e.printStackTrace();
-	    }
-	}
-    }
     
 
 
@@ -224,13 +170,12 @@ public class Secretaire {
 
 	
 	Secretaire s = new Secretaire(new InterfaceReseau("maure"));
-	//s.traiteMessage(null,0,"maure:hello");
-	//s.traiteMessage(null,0,"mazak:hello:5000");
-	String welcomeMsg = "maure:mazak0:welcome:mazak;255.255.255.255;5000:nualia;255.255.255.255;5001:derol;255.255.255.255;5000:drassius;255.255.255.255;5000";
-	s.traiteMessage(null,0,welcomeMsg);
-	/*s.traiteWelcomeMessage(welcomeMsg);
+	s.traiteMessage(null,0,"maure:hello");
+	s.traiteMessage(null,0,"mazak:hello:5000");
+	String welcomeMsg = "maure:welcome:mazak;255.255.255.255;5000:nualia;255.255.255.255;5001:derol;255.255.255.255;5000:drassius;255.255.255.255;5000";
+	s.traiteWelcomeMessage(welcomeMsg);
 	System.out.println("Testhello");
-	s.traiteHelloMessage("maure:hello", null);*/
+	s.traiteHelloMessage("maure:hello", null);
 	}
 
 }

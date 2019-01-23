@@ -136,8 +136,4 @@ public class BDD {
         return resultat;
   
     }
-    
-    public void changementPseudo(String previousPseudo, String newPseudo) {
-    	
-    }
 }
