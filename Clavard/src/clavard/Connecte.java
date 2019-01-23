@@ -20,6 +20,7 @@ import javax.swing.DefaultListModel;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JList;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.SwingConstants;
@@ -49,6 +50,7 @@ public class Connecte implements ActionListener, MouseListener, KeyListener {
 	JList list;
 	Controller ctrl;
 	DefaultListModel listModel;
+	JLabel lblNewLabel_1;
 	
 	public Connecte(String log, Controller controller) {
 		ctrl=controller;
@@ -86,7 +88,7 @@ public class Connecte implements ActionListener, MouseListener, KeyListener {
 		frmConnecte.getContentPane().add(panel);
 		panel.setLayout(null);
 		
-		JLabel lblNewLabel = new JLabel("ConnectÃ©(s) : "+nbCo);
+		JLabel lblNewLabel = new JLabel("Connecté(s) : "+nbCo);
 		lblNewLabel.setBounds(56, 103, 130, 23);
 		lblNewLabel.setFont(new Font("Book Antiqua", Font.BOLD, 18));
 		lblNewLabel.setForeground(Color.WHITE);
@@ -145,7 +147,7 @@ public class Connecte implements ActionListener, MouseListener, KeyListener {
 		frmConnecte.getContentPane().add(panel_1);
 		panel_1.setLayout(null);
 		
-		JLabel lblNewLabel_1 = new JLabel("Bonjour "+login+" !");
+		lblNewLabel_1 = new JLabel("Bonjour "+login+" !");
 		lblNewLabel_1.setForeground(Color.WHITE);
 		lblNewLabel_1.setFont(new Font("Book Antiqua", Font.PLAIN, 18));
 		lblNewLabel_1.setBounds(22, 13, 301, 23);
@@ -201,13 +203,26 @@ public class Connecte implements ActionListener, MouseListener, KeyListener {
 		
 		scroll.setViewportView(TextArea);
 		panel_4.add(scroll);
+		
+		JButton btnChangerDePseudo = new JButton("Changer de pseudo");
+		btnChangerDePseudo.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				JOptionPane jop = new JOptionPane();
+			    login = jop.showInputDialog(null, "Votre nouveau pseudo ?", "Changer pseudo", JOptionPane.QUESTION_MESSAGE);
+			    lblNewLabel_1.setText("Bonjour "+login+" !");
+			}
+		});
+		btnChangerDePseudo.setBackground(Color.LIGHT_GRAY);
+		btnChangerDePseudo.setFont(new Font("Source Sans Pro Semibold", Font.PLAIN, 15));
+		btnChangerDePseudo.setBounds(625, 30, 161, 44);
+		panel_1.add(btnChangerDePseudo);
 		panel_3.setVisible(false);
 		
-		frmConnecte.setTitle("ConnectÃ©");
+		frmConnecte.setTitle("Connecté");
 		frmConnecte.setVisible(true);
 	}
 	
-	/* methode appelÃ©e quand un user se connecte
+	/* methode appelée quand un user se connecte
 	 * ou se deconnecte
 	 */
 	public void majListeCo() {
@@ -264,8 +279,8 @@ public class Connecte implements ActionListener, MouseListener, KeyListener {
 
    
 	public void envoi(String mess) {
-		/*Ecriture dans la base de donnÃ©es et refresh ?
-		 Ã©crire BDD */
+		/*Ecriture dans la base de données et refresh ?
+		 écrire BDD */
 		if(mess.isEmpty()) {
 		}
 		else {
@@ -288,7 +303,7 @@ public class Connecte implements ActionListener, MouseListener, KeyListener {
 			TextArea.append(recepteur+" : "+message+"\n");
 		}
 		} catch (NullPointerException e) {
-			System.out.println("Connecte : La fenÃªtre de discussion ouverte ne correspond pas au rÃ©cÃ©pteur du message reÃ§u");
+			System.out.println("Connecte : La fenêtre de discussion ouverte ne correspond pas au récépteur du message reçu");
 			recepteur=pseudoEmetteur;
 			try {
 				afficheChat();
@@ -385,6 +400,4 @@ public class Connecte implements ActionListener, MouseListener, KeyListener {
 			}
 	        }
 	}
-	
-	
 }

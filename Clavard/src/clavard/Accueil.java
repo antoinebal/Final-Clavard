@@ -8,11 +8,13 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 
+import javax.swing.ButtonGroup;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 import javax.swing.JLabel;
+import javax.swing.JRadioButton;
 
 public class Accueil implements ActionListener, KeyListener{
 	private JFrame frmAccueil;
@@ -104,6 +106,25 @@ public class Accueil implements ActionListener, KeyListener{
 		lblLePseudoNe.setBounds(301, 481, 471, 48);
 		lblLePseudoNe.setVisible(false);
 		frmAccueil.getContentPane().add(lblLePseudoNe);
+		
+		JRadioButton rdbtnLocal = new JRadioButton("Local");
+		rdbtnLocal.setFont(new Font("Source Sans Pro", Font.PLAIN, 18));
+		rdbtnLocal.setForeground(Color.WHITE);
+		rdbtnLocal.setBackground(new Color(0,0, 51));
+		rdbtnLocal.setBounds(297, 322, 75, 25);
+		rdbtnLocal.setSelected(true);
+		frmAccueil.getContentPane().add(rdbtnLocal);
+		
+		JRadioButton rdbtnEnLigne = new JRadioButton("En ligne");
+		rdbtnEnLigne.setFont(new Font("Source Sans Pro", Font.PLAIN, 18));
+		rdbtnEnLigne.setForeground(Color.WHITE);
+		rdbtnEnLigne.setBackground(new Color(0,0, 51));
+		rdbtnEnLigne.setBounds(681, 322, 91, 25);
+		frmAccueil.getContentPane().add(rdbtnEnLigne);
+		
+		ButtonGroup group = new ButtonGroup();
+		group.add(rdbtnEnLigne);
+		group.add(rdbtnLocal);
 		
 		frmAccueil.setVisible(true);
 		

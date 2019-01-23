@@ -83,7 +83,7 @@ public class BDD {
     	try {
 			ArrayList<Message> testPrint = this.lire_mess(login_emet, login_recept);
 			for (Message msg : testPrint) {
-				System.out.println("Emetteur : "+msg.getEmetteur()+"  Recepteur : "+msg.getRecepteur()+"  Date : "+msg.getDate()+"  Conntenu  :  "+msg.getContenu()); 
+				//System.out.println("Emetteur : "+msg.getEmetteur()+"  Recepteur : "+msg.getRecepteur()+"  Date : "+msg.getDate()+"  Contenu  :  "+msg.getContenu()); 
 			}
 		} catch (ParseException e) {
 			e.printStackTrace();
@@ -138,6 +138,9 @@ public class BDD {
     }
     
     public void changementPseudo(String previousPseudo, String newPseudo) {
-    	
+    	String prevrplcd = previousPseudo.replace("'", "\\\\");
+    	String newrplcd = newPseudo.replace("'", "\\\\");
+    	query("UPDATE messages SET loginemetteur='"+newrplcd+"' WHERE loginemetteur = '"+prevrplcd+"'");
+    	query("UPDATE messages SET loginrecepteur='"+newrplcd+"' WHERE loginrecepteur = '"+prevrplcd+"'");
     }
 }
