@@ -22,7 +22,7 @@ public class Controller {
 		ListeCo = new ArrayList<String>();
 		ListeCo.add("Le Balayssac FR");
 		ListeCo.add("Sauveur Gascou");
-		ListeCo.add("thÃ©o");
+		ListeCo.add("théo");
 		ListeCo.add("khalil");
 		ListeCo.add("Slim le S");
 		ListeCo.add("Mehdi");
@@ -30,11 +30,11 @@ public class Controller {
 	
 	public Controller() {
 		
-		//fenÃªtre d'authentification
+		//fenêtre d'authentification
 		Accueil accueil = new Accueil();
 		
-		//on rÃ©cupÃ¨re le pseudo
-		while ((pseudo=accueil.getLog())==null) {
+		//on récupère le pseudo
+		while ((pseudo=accueil.getLog())==null || pseudo=="") {
 			try {
 				Thread.sleep(500);
 			} catch (InterruptedException e) {
@@ -43,7 +43,7 @@ public class Controller {
 		}
 		
 		
-		//on crÃ©e l'ir
+		//on crée l'ir
 		ir_ = new InterfaceReseau(pseudo, 6000, 5000, this);
 		
 		while (!ir_.isCo()) {
@@ -54,18 +54,18 @@ public class Controller {
 			}
 		}
 		
-		//on rÃ©cupÃ¨re la liste des connectÃ©s
+		//on récupère la liste des connectés
 		ListeCo = ir_.annuaireToPseudoList();
 		
-		connexion = new BDD("/home/abalayss/clavard-workspace/Clavard/src/clavard/Clavard.db");
+		connexion = new BDD("C:/Users/Mehdi/Desktop/INSA/4IR/POO/Final-Clavard/Clavard/src/clavard/Clavard.db");
         connexion.connect();
 		
-		//on a la liste donc on peut crÃ©er la fenetre connecte
+		//on a la liste donc on peut créer la fenetre connecte
 		fenetreCo_ = new Connecte(pseudo, this);
 		ready_=true;
 	}
 	
-	/*fonction appelÃ©e depuis le Chat. Appelle envoyerMessage de
+	/*fonction appelée depuis le Chat. Appelle envoyerMessage de
 	 * InterfaceReseau
 	 */
 	public void envoyerMessage(String pseudoDest, String message) {
@@ -103,16 +103,16 @@ public class Controller {
 		return new ArrayList<Message>();
 	}
 	
-	/*appelÃ©e quand l'utilisateur ferme la fenÃªtre : 
-	 * il faut close la bdd et Ã©teindre l'IR
+	/*appelée quand l'utilisateur ferme la fenêtre : 
+	 * il faut close la bdd et éteindre l'IR
 	 */
 	public void fermer() {
 		connexion.close();
 		ir_.extinction();
 	}
 	
-	/* mÃ©thode appelÃ©e par l'IR quand un contact se
-	 * dÃ©connecte
+	/* méthode appelée par l'IR quand un contact se
+	 * déconnecte
 	 */
 	
 	
@@ -120,9 +120,9 @@ public class Controller {
 		new Controller();
 	}
 	
-	/* fonction Ã  appeler depuis l'ir quand il y a
-	 * un nouveau connectÃ©. Le controller va notifier 
-	 * la fenÃªtre Connecte de cela
+	/* fonction à appeler depuis l'ir quand il y a
+	 * un nouveau connecté. Le controller va notifier 
+	 * la fenêtre Connecte de cela
 	 */
 	public void nouveauConnecte(String pseudo) {
 		if (ready_) {
@@ -131,8 +131,8 @@ public class Controller {
 		}
 	}
 	
-	/* mÃ©thode appelÃ©e par l'IR quand un contact se
-	 * dÃ©connecte
+	/* méthode appelée par l'IR quand un contact se
+	 * déconnecte
 	 */
 	public void decoContact(String pseudo) {
 		if (ready_) {
@@ -144,30 +144,24 @@ public class Controller {
 		}
 	}
 	
-	/*fonction appelÃ©e depuis l'IR, on : 
-	 * > mÃ j la BDD
-	 * > mÃ j l'interface graphique
+	/*fonction appelée depuis l'IR, on : 
+	 * > màj la BDD
+	 * > màj l'interface graphique
 	 */
 	public void traiterNewPseudo(String previousPseudo, String newPseudo) {
-		System.out.println("Controller : "+previousPseudo+" s'appelle dÃ©sormais "+newPseudo);
+		System.out.println("Controller : "+previousPseudo+" s'appelle désormais "+newPseudo);
 		
-		//on mÃ j la bdd
+		//on màj la bdd
 		connexion.changementPseudo(previousPseudo, newPseudo);
 		
-		//on mÃ j l'ig
-		ListeCo.remove(previousPseudo);
-		ListeCo.add(newPseudo);
-		fenetreCo_.majListeCo();
-	}
-	
-	public void changementPseudo(String newPseudo) {
-		pseudo=newPseudo;
+		//on màj l'ig
 		try {
-			ir_.informerNewPseudo(newPseudo);
-		} catch (CorrespondantException e) {
+			fenetreCo_.afficheChat();
+		} catch (ParseException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		
 	}
 	
 	
