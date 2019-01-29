@@ -67,7 +67,7 @@ public class Controller {
 		//on récupère la liste des connectés
 		ListeCo = ir_.annuaireToPseudoList();
 		
-		connexion = new BDD("/home/rahmoun/4IR/POO/Projet/Final-Clavard/Clavard/src/clavard/Clavard.db");
+		connexion = new BDD("C:/Users/Mehdi/Desktop/INSA/4IR/POO/Projet/Final-Clavard/Clavard/src/clavard/Clavard.db");
         connexion.connect();
 		
 		//on a la liste donc on peut créer la fenetre connecte
@@ -111,6 +111,11 @@ public class Controller {
 			e.printStackTrace();
 		}
 		return new ArrayList<Message>();
+	}
+	
+	public ArrayList<String> listeloginbdd(){
+		ArrayList<String> listeloginbdd = connexion.loginbdd();
+		return listeloginbdd;
 	}
 	
 	/*appelée quand l'utilisateur ferme la fenêtre : 

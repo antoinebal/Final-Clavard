@@ -208,7 +208,7 @@ public class Connecte implements ActionListener, MouseListener, KeyListener {
 			public void actionPerformed(ActionEvent arg0) {
 				JOptionPane jop = new JOptionPane();
 			    String testnewpseudo = jop.showInputDialog(null, "Votre nouveau pseudo ? (Pas de \":\" ou de \";\" ni un déjà existant)" , "Changer pseudo", JOptionPane.QUESTION_MESSAGE);
-			    
+			    ArrayList<String> pseudoexistants = ctrl.listeloginbdd();
 			   
 			    ListCo = ctrl.getListeCo();
 			    Boolean existedeja = false;
@@ -220,6 +220,16 @@ public class Connecte implements ActionListener, MouseListener, KeyListener {
 			    	
 			    }
 			    
+			    for (String testeur : pseudoexistants) {
+			    	if(testeur.equals(login)) {
+			    		
+			    	}
+			    	else {
+			    		if(testeur.equals(testnewpseudo)) {
+			    			existedeja=true;
+			    		}
+			    	}
+			    }
 			    
 			    if (testnewpseudo.contains(":") || testnewpseudo.contains(";") || testnewpseudo.isEmpty() || existedeja) {
 			    }

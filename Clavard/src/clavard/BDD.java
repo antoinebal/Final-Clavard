@@ -88,7 +88,27 @@ public class BDD {
     }
     
     
-    
+    public ArrayList<String> loginbdd() {
+    	ResultSet resultSet = query("Select loginemetteur from messages union select loginrecepteur from messages");
+    	ArrayList<String> listepseudos = new ArrayList<String>();
+    	try {
+            while (resultSet.next()) {
+            	String loem=resultSet.getString("loginemetteur");
+               	//String lore=resultSet.getString("loginrecepteur");
+               	String loemreplaced=loem.replace("\\\\", "'");
+               	//String lorereplaced=lore.replace("\\\\", "'");
+            	listepseudos.add(loemreplaced);
+                //System.out.println("Le "+resultSet.getString("date")+" : "+resultSet.getString("mess"));
+            }
+        } catch (SQLException e) {
+            //e.printStackTrace();
+        } catch (NullPointerException e) {
+        	return listepseudos;
+        }
+    	
+    	return listepseudos;
+    	
+    }
     
     /*public InetAddress getIP(String pseudo) {
     	ResultSet resultSet = query("SELECT IP FROM users WHERE pseudo = '" +pseudo+"'");
