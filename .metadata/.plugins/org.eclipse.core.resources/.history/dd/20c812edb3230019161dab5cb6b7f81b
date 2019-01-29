@@ -208,14 +208,9 @@ public class Connecte implements ActionListener, MouseListener, KeyListener {
 		btnChangerDePseudo.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				JOptionPane jop = new JOptionPane();
-			    String testnewpseudo = jop.showInputDialog(null, "Votre nouveau pseudo ? (Pas de \":\" ou de \";\")" , "Changer pseudo", JOptionPane.QUESTION_MESSAGE);
-			    if (testnewpseudo.contains(":") || testnewpseudo.contains(";") || testnewpseudo.isEmpty()) {
-			    }
-			    else {
-			    	login=testnewpseudo;
-			    	lblNewLabel_1.setText("Bonjour "+login+" !");
-			    	ctrl.changementPseudo(login);
-			    }
+			    login = jop.showInputDialog(null, "Votre nouveau pseudo ?", "Changer pseudo", JOptionPane.QUESTION_MESSAGE);
+			    lblNewLabel_1.setText("Bonjour "+login+" !");
+			    ctrl.changementPseudo(login);
 			}
 		});
 		btnChangerDePseudo.setBackground(Color.LIGHT_GRAY);
@@ -276,9 +271,8 @@ public class Connecte implements ActionListener, MouseListener, KeyListener {
 		}
 		
 		lblNewLabel_3.setText("Discussion avec "+recepteur);
-		if(!panel_3.isVisible()) {
-			panel_3.setVisible(true);
-		}
+		lblNewLabel_3.setVisible(true);
+		panel_3.setVisible(true);
 		
 		
 		

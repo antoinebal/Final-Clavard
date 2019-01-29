@@ -198,7 +198,7 @@ public class Secretaire {
 	 String pseudoEm = tchaoMsg.split(":")[0];
 	 /*logiquement, si on a reçu ce message, c'est que la connexion n'était pas établie
 	   avec ce correspondant, on va donc seulement supprimer le correspondant de l'annuaire */
-	 ir_.supprimeCorrespondant(pseudoEm, true);
+	 ir_.supprimeCorrespondant(pseudoEm);
 
 	 String requeteDC=tchaoMsg.split(":")[2];
 	 if (requeteDC.equals("1")) {

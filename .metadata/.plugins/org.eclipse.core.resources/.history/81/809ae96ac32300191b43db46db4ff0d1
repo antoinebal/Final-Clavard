@@ -166,13 +166,12 @@ public abstract class InterfaceReseau {
 
     //fonction à appeler depuis bbTCP quand on éteint l'ir ou quand il reçoît un msg TCP "tchao"
     //supprime le Correspondant ayant pour clé le pseudo en argument
-    public void supprimeCorrespondant(String pseudo, boolean b) {
+    public void supprimeCorrespondant(String pseudo) {
 	annuaire_.remove(pseudo);
 	printAnnuaire();
 	
-	
 	//on informe le controller
-	if (b) {controller_.decoContact(pseudo);}
+	controller_.decoContact(pseudo);
     }
 
     public String getPseudo() {return pseudo_;}
@@ -264,7 +263,7 @@ public abstract class InterfaceReseau {
 	} else {
 	    Correspondant corr = annuaire_.get(previousPseudo);
 	    corr.setPseudo(newPseudo);
-	    supprimeCorrespondant(previousPseudo, false);
+	    supprimeCorrespondant(previousPseudo);
 	    annuaire_.put(newPseudo, corr);
 	    System.out.println("IR : ANNUAIRE APRES SUPPRESSION");
 	    printAnnuaire();

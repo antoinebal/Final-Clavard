@@ -88,7 +88,7 @@ public class BlablaTCP {
 	    e.printStackTrace();
 	}
 	if (b) {
-	    ir_.supprimeCorrespondant(pseudoCorrespondant_,true);
+	    ir_.supprimeCorrespondant(pseudoCorrespondant_);
 	}
 	System.out.println("BBTCP : connexion avec "+pseudoCorrespondant_+" terminée.");
     }

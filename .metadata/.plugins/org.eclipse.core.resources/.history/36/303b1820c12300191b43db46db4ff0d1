@@ -168,7 +168,6 @@ public class Controller {
 	}
 	
 	public void changementPseudo(String newPseudo) {
-		connexion.changementPseudo(pseudo, newPseudo);
 		pseudo=newPseudo;
 		ir_.informerNewPseudo(newPseudo);
 	}

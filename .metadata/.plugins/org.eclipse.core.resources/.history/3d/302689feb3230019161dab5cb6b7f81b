@@ -276,9 +276,8 @@ public class Connecte implements ActionListener, MouseListener, KeyListener {
 		}
 		
 		lblNewLabel_3.setText("Discussion avec "+recepteur);
-		if(!panel_3.isVisible()) {
-			panel_3.setVisible(true);
-		}
+		lblNewLabel_3.setVisible(true);
+		panel_3.setVisible(true);
 		
 		
 		
