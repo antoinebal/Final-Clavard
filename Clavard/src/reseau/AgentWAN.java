@@ -3,9 +3,11 @@ package reseau;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Map;
 import java.util.Scanner;
 
 import clavard.Controller;
+import reseau.InterfaceReseau.Correspondant;
 
 public class AgentWAN extends InterfaceReseau {
 	private HttpTalker httpTalker_;
@@ -30,14 +32,36 @@ public class AgentWAN extends InterfaceReseau {
 
 	@Override
 	public void informerNewPseudo(String newPseudo) {
-		// TODO Auto-generated method stub
+		//on envoie la requête au serveur
+		httpTalker_.requeteNewPseudo(newPseudo);
 		
+		//on change le pseudo enregistré localement
+		pseudo_=newPseudo;
 	}
 
 	@Override
 	public void extinction() {
-		// TODO Auto-generated method stub
 		
+		//on termine toutes les connexions TCP en cours
+		for(Map.Entry<String, Correspondant> entry : annuaire_.entrySet()) {
+		    String pseudo = entry.getKey();
+		    Correspondant corr = entry.getValue();
+		    if (corr.coEtablie()) { //on termine les connexions BlablaTCP
+			corr.getBBTCP().envoyerTchao(false);
+			//argument faux car appelé depuis agent wan
+			corr.getBBTCP().terminerConnexion(false);
+			System.out.println("AgentWAN : (ext) connexion terminée avec "+pseudo);
+		    }
+		}
+		
+		annuaire_.clear();
+		System.out.println("AW : ANNUAIRE VIDÉ, CONNEXIONS FERMÉES");
+		printAnnuaire();
+		
+		//on envoie une requête GET au serveur avec l'attribut deconnexion à 1
+		httpTalker_.seDeconnecter();
+		
+		termine_=true;	
 	}
 	
 	
