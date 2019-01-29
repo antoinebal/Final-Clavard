@@ -14,7 +14,7 @@ import java.util.ArrayList;
 import java.util.Date;
 
 public class BDD {
-	private String DBPath = "Chemin aux base de donnée SQLite";
+	private String DBPath = "Chemin aux base de donnÃ©e SQLite";
     private Connection connection = null;
     private Statement statement = null;
  
@@ -26,7 +26,7 @@ public class BDD {
             Class.forName("org.sqlite.JDBC");
             connection = DriverManager.getConnection("jdbc:sqlite:" + DBPath);
             statement = connection.createStatement();
-            System.out.println("Connexion Ã  " + DBPath + " avec succès");
+            System.out.println("Connexion Ã  " + DBPath + " avec succÃ¨s");
         } catch (ClassNotFoundException notFoundException) {
             notFoundException.printStackTrace();
             System.out.println("Erreur de connexion");
@@ -44,7 +44,7 @@ public class BDD {
     	
     	try {
             while (resultSet.next()) {
-            	//Créer une liste (map ?), mettre tous les messages dedans et envoyer la liste
+            	//CrÃ©er une liste (map ?), mettre tous les messages dedans et envoyer la liste
             	String strdate = resultSet.getString("date");
             	String contenu = resultSet.getString("mess");
             	String loem=resultSet.getString("loginemetteur");
@@ -73,13 +73,10 @@ public class BDD {
     	String receptrplcd = login_recept.replace("'", "\\\\");
     	
     	String messrplcd = mess.replace("'", "\\\\");
-    	
-
-    	
+    		
     	query("INSERT INTO messages(loginemetteur,loginrecepteur, date, mess) VALUES ( '" +emetrplcd+"','"+receptrplcd+"','"+strDate+"','"+messrplcd+"')");
-    	
-    	
-    	/*System.out.println("BDD : JE VIENS DE QUERY, voici la liste des messages dans la bdd");
+    	  	
+    	System.out.println("BDD : JE VIENS DE QUERY, voici la liste des messages dans la bdd");
     	try {
 			ArrayList<Message> testPrint = this.lire_mess(login_emet, login_recept);
 			for (Message msg : testPrint) {
@@ -87,7 +84,7 @@ public class BDD {
 			}
 		} catch (ParseException e) {
 			e.printStackTrace();
-		}*/
+		}
     }
     
     
@@ -107,7 +104,7 @@ public class BDD {
 			
 		} catch (SQLException e) {
 			e.printStackTrace();
-			System.out.println("Mauvais pseudo ou pas d'IP associé");
+			System.out.println("Mauvais pseudo ou pas d'IP associÃ©");
 			
 		}catch (UnknownHostException e) {
 			e.printStackTrace();

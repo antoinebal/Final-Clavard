@@ -4,6 +4,8 @@ import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Date;
 
+import reseau.AgentLAN;
+import reseau.AgentWAN;
 import reseau.CorrespondantException;
 import reseau.InterfaceReseau;
 
@@ -22,19 +24,20 @@ public class Controller {
 		ListeCo = new ArrayList<String>();
 		ListeCo.add("Le Balayssac FR");
 		ListeCo.add("Sauveur Gascou");
-		ListeCo.add("théo");
+		ListeCo.add("thÃ©o");
 		ListeCo.add("khalil");
 		ListeCo.add("Slim le S");
 		ListeCo.add("Mehdi");
 	}*/
 	
-	public Controller() {
+	public Controller(boolean test) {}
+	public Controller(int tcpPort, int udpPort) {
 		
-		//fenêtre d'authentification
+		//fenÃªtre d'authentification
 		Accueil accueil = new Accueil();
 		
-		//on récupère le pseudo
-		while ((pseudo=accueil.getLog())==null || pseudo=="") {
+		//on rÃ©cupÃ¨re le pseudo
+		while ((pseudo=accueil.getLog())==null) {
 			try {
 				Thread.sleep(500);
 			} catch (InterruptedException e) {
@@ -43,9 +46,16 @@ public class Controller {
 		}
 		
 		
-		//on crée l'ir
-		ir_ = new InterfaceReseau(pseudo, 6000, 5000, this);
+		//on crÃ©e l'ir en fonction du choix de communication de l'utilisateur
+		if (accueil.isLocal()) {
+			System.out.println("Controller : MODE LOCAL SELECTIONNE");
+			ir_ = new AgentLAN(pseudo, 6000, 5000, this);
+		} else {
+			System.out.println("Controller : MODE WAN SELECTIONNE");
+			ir_ = new AgentWAN(pseudo, tcpPort, udpPort, this);
+		}
 		
+		//on attend d'Ãªtre connectÃ©
 		while (!ir_.isCo()) {
 			try {
 				Thread.sleep(200);
@@ -54,18 +64,18 @@ public class Controller {
 			}
 		}
 		
-		//on récupère la liste des connectés
+		//on rÃ©cupÃ¨re la liste des connectÃ©s
 		ListeCo = ir_.annuaireToPseudoList();
 		
-		connexion = new BDD("C:/Users/Mehdi/Desktop/INSA/4IR/POO/Final-Clavard/Clavard/src/clavard/Clavard.db");
+		connexion = new BDD("/home/abalayss/clavard-workspace/Clavard/src/clavard/Clavard.db");
         connexion.connect();
 		
-		//on a la liste donc on peut créer la fenetre connecte
+		//on a la liste donc on peut crÃ©er la fenetre connecte
 		fenetreCo_ = new Connecte(pseudo, this);
 		ready_=true;
 	}
 	
-	/*fonction appelée depuis le Chat. Appelle envoyerMessage de
+	/*fonction appelÃ©e depuis le Chat. Appelle envoyerMessage de
 	 * InterfaceReseau
 	 */
 	public void envoyerMessage(String pseudoDest, String message) {
@@ -103,26 +113,23 @@ public class Controller {
 		return new ArrayList<Message>();
 	}
 	
-	/*appelée quand l'utilisateur ferme la fenêtre : 
-	 * il faut close la bdd et éteindre l'IR
+	/*appelÃ©e quand l'utilisateur ferme la fenÃªtre : 
+	 * il faut close la bdd et Ã©teindre l'IR
 	 */
 	public void fermer() {
 		connexion.close();
 		ir_.extinction();
 	}
 	
-	/* méthode appelée par l'IR quand un contact se
-	 * déconnecte
+	/* mÃ©thode appelÃ©e par l'IR quand un contact se
+	 * dÃ©connecte
 	 */
 	
 	
-	public static void main(String[] args) {
-		new Controller();
-	}
 	
-	/* fonction à appeler depuis l'ir quand il y a
-	 * un nouveau connecté. Le controller va notifier 
-	 * la fenêtre Connecte de cela
+	/* fonction Ã  appeler depuis l'ir quand il y a
+	 * un nouveau connectÃ©. Le controller va notifier 
+	 * la fenÃªtre Connecte de cela
 	 */
 	public void nouveauConnecte(String pseudo) {
 		if (ready_) {
@@ -131,8 +138,8 @@ public class Controller {
 		}
 	}
 	
-	/* méthode appelée par l'IR quand un contact se
-	 * déconnecte
+	/* mÃ©thode appelÃ©e par l'IR quand un contact se
+	 * dÃ©connecte
 	 */
 	public void decoContact(String pseudo) {
 		if (ready_) {
@@ -144,25 +151,31 @@ public class Controller {
 		}
 	}
 	
-	/*fonction appelée depuis l'IR, on : 
-	 * > màj la BDD
-	 * > màj l'interface graphique
+	/*fonction appelÃ©e depuis l'IR, on : 
+	 * > mÃ j la BDD
+	 * > mÃ j l'interface graphique
 	 */
 	public void traiterNewPseudo(String previousPseudo, String newPseudo) {
-		System.out.println("Controller : "+previousPseudo+" s'appelle désormais "+newPseudo);
+		System.out.println("Controller : "+previousPseudo+" s'appelle dÃ©sormais "+newPseudo);
 		
-		//on màj la bdd
+		//on mÃ j la bdd
 		connexion.changementPseudo(previousPseudo, newPseudo);
 		
-		//on màj l'ig
-		try {
-			fenetreCo_.afficheChat();
-		} catch (ParseException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		
+		//on mÃ j l'ig
+		ListeCo.remove(previousPseudo);
+		ListeCo.add(newPseudo);
+		fenetreCo_.majListeCo();
 	}
+	
+	public void changementPseudo(String newPseudo) {
+		pseudo=newPseudo;
+		ir_.informerNewPseudo(newPseudo);
+	}
+	
+	public static void main(String[] args) {
+		new Controller(6001, 5001);
+	}
+	
 	
 	
 	

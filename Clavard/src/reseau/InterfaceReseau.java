@@ -5,45 +5,34 @@ import java.util.Scanner;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.net.InetAddress;
-import java.util.Timer;
-import java.util.TimerTask;
 import clavard.Controller;
 
 
-public class InterfaceReseau {
-
-    //Controller controller_;
+public abstract class InterfaceReseau {
 
     /*associe les pseudos aux objets Correspondant*/
-    private Map<String, Correspondant> annuaire_;
+    protected Map<String, Correspondant> annuaire_;
 
     //serveur TCP
-    private ServeurTCP serveur_;
+    protected ServeurTCP serveur_;
 
     //port d'écoute du serveur TCP
-    private int portServeur_;
+    protected int portServeur_;
 
     //pseudo du user possédant l'ir
-    private String pseudo_;
+    protected String pseudo_;
 
     //port d'écoute UDP
-    private int portUDP_;
+    protected int portUDP_;
 
     //objet Runnable d'écoute UDP
-    private UDPListener udpListener_;
-
-    //objet pour envoyer des messages UDP
-    private UDPTalk udpTalk_;
+    protected UDPListener udpListener_;
 
     //classe qui gère les messages UDP (administration du réseau)
-    private Secretaire secretaire_;
+    protected Secretaire secretaire_;
 
     //connected_ passe à vrai quand l'interface réseau a des contacts
-    private boolean connected_;
-
-    /* vrai si on est le dernier connecté. Si on reçoit un message hello,
-       on envoie notre annuaire à l'émetteur et dernierCo passe à faux.*/
-    private boolean dernierCo_;
+    protected boolean connected_;
 
     /* ce boolean est utile pour terminer le UDPListener : en effet,
        comme son socket est bloqué sur un .receive, appeler sa méthode close
@@ -52,16 +41,9 @@ public class InterfaceReseau {
        fermera ses sockets, sort de la boucle et termine son activité 
        (c'est aussi utile pour le thread attend connexion de serveur, qui
        reste bloqué sur une fonction accept)*/
-    private boolean termine_;
-
-    //timer utilisé pour la récéption de Hello
-    Timer timerHello_ = new Timer();
-
-    /*TimerTask -> si on dépasse les 2 secondes sans être connecté (ie sans avoir reçu de welcome)
-      -> on considère qu'on est le premier connecté -> connected passe à vrai */
-    TTHello ttHello_;
+    protected boolean termine_;
     
-    Controller controller_;
+    protected Controller controller_;
 
 
     //constructeur pour tester secrétaire
@@ -84,7 +66,6 @@ public class InterfaceReseau {
 
 	//booléens d'état
 	connected_=false;
-	dernierCo_=true;
 	termine_=false;
 
 	/*le secrétaire est l'assistant de l'interface réseau : il s'occupe
@@ -97,16 +78,6 @@ public class InterfaceReseau {
 	udpListener_=new UDPListener(portUDP_, this);
 	Thread threadUDPListener = new Thread(udpListener_);
 	threadUDPListener.start();
-
-	udpTalk_ = new UDPTalk(portUDP_);
-
-	//on broadcast un hello message
-	udpTalk_.broadcastMessage(secretaire_.construireHelloMessage());
-	System.out.println("IR : Hello broadcasté");
-
-	//on lance le timer
-	ttHello_ = new TTHello(this);
-	timerHello_.scheduleAtFixedRate(ttHello_, 1000, 1000);
     }
 
     public void recevoirMessageUDP(InetAddress address, int port, String message) {
@@ -114,9 +85,7 @@ public class InterfaceReseau {
 	secretaire_.traiteMessage(address, port, message);
     }
 
-    public void envoyerUDP(InetAddress address, String message) {
-	udpTalk_.sendMessageUDP(message, address);
-    }
+    
 
     public void envoyerMessage (String pseudoDest, String message) throws CorrespondantException {
 	if (annuaire_.containsKey(pseudoDest)) {
@@ -207,11 +176,19 @@ public class InterfaceReseau {
 
     public String getPseudo() {return pseudo_;}
     public int getPort() {return portServeur_;}
+    public int getPortUDP() {return portUDP_;}
+    public String getIP() {
+    	return secretaire_.retourneIPLocale();
+    }
     public boolean isCo() {return connected_;}
-    public boolean dernierCo() {return dernierCo_;}
     public boolean isTermine() {return termine_;}
-    public void setDernierCo(boolean b) {dernierCo_=b;}
     public void setCo() {connected_=true;}
+    //à redéfinir dans AgentLAN
+    public boolean dernierCo() {return false;}
+    //à redéfinir dans AgentLAN
+    public void setDernierCo(boolean b) {}
+    //à redéfinir dans AgentLAN
+    public void envoyerUDP(InetAddress address, String message) {}
     public void setPseudo(String pseudo) {
 	System.out.println("IR : je change de pseudo "+pseudo_+" --> "+pseudo);
 	pseudo_=pseudo;
@@ -227,8 +204,7 @@ public class InterfaceReseau {
 		String stringAdresse = corr.getInetAddress().toString().replace("/", "");
 		result=result+":"+pseudo+";"+stringAdresse+";"+Integer.toString(corr.getPort());
 		System.out.println("IR annuaire to String, adresse de "+pseudo+" stockée "+corr.getInetAddress().toString());
-	    } 
-	    
+	    } 	    
 	}
 	return result;
     }
@@ -246,12 +222,7 @@ public class InterfaceReseau {
 	return result;
     }
 
-    /*fonction utilisée par le secrétaire pour vérifier si un pseudo appartient
-      à l'annuaire */
-    public boolean dejaPris(String pseudo) {
-	return annuaire_.containsKey(pseudo);
-    }
-
+   
 
     //ici fonctions pour le TEST
     public void addAnnuaire(String pseudo, InetAddress address, int port) {
@@ -266,22 +237,18 @@ public class InterfaceReseau {
 	    corr.print();
 	}
     }
+    
+	    /*fonction utilisée par le secrétaire pour vérifier si un pseudo appartient
+	    à l'annuaire */
+	  public boolean dejaPris(String pseudo) {
+		return annuaire_.containsKey(pseudo);
+	  }
 
 
     /* fonction appelée depuis le controller quand l'utilisateur change de pseudo.
        Le pseudo est censé être validé en amont, mais si celui-ci existe déjà au moment
        de l'appel de cette fonction, on lance une CorrespondantException */
-    public void informerNewPseudo(String newPseudo) throws CorrespondantException {
-	if (dejaPris(newPseudo)) {
-	    throw new CorrespondantException("Le nouveau pseudo "+newPseudo+" est déjà pris.");
-	} else  {
-	    //on broadcaste le message de changement de pseudo
-	    udpTalk_.broadcastMessage(secretaire_.construireNewPseudoMessage(newPseudo));
-
-	    //on change le pseudo enregistré dans l'ir
-	    pseudo_=newPseudo;
-	}
-    }
+    public abstract void informerNewPseudo(String newPseudo);
 
     /* fonction appelée depuis le secrétaire, l'IR doit : 
        > lever une exception si le pseudo existe déjà
@@ -303,49 +270,17 @@ public class InterfaceReseau {
 	    controller_.traiterNewPseudo(previousPseudo, newPseudo);
 	}
     }
+    
 
 
-    /*extinction s'occupe de terminer toutes les connexions
-      et de l'organisation du départ de cet utilisateur du projet.
-      Il se charge des actions suivantes : 
-      >extinction parcourt l'annuaire : 
-      pour chaque Correspondant, 
-      -si coActive, on envoie "tchao"
-      en TCP et on ferme le socket ; 
-      -sinon envoyer TchaoMessage en
-      UDP sur InetAddress que contient Correspondant
-      (si celui qui s'éteint est dernier co le premier de l'annuaire 
-      avec pas de connexion établie reçoit un tchao message spécial : avec un champ 1
-      cela signifie qu'il passe dernier connecté)
-      >termine le UDPTalk(fermer les sockets)
-      >(terminer les threads)
-      >passer termine_ à true, ce qui induira l'arrêt et la destruction
-      des sockets de UDPListener et Serveur, si ce n'est pas déjà fait pas
-      leurs timeout respéctifs*/
-    public void extinction() {
-	System.out.println("IR : EXTINCTION");
-	for(Map.Entry<String, Correspondant> entry : annuaire_.entrySet()) {
-	    String pseudo = entry.getKey();
-	    Correspondant corr = entry.getValue();
-	    if (corr.coEtablie()) { //on termine les connexions BlablaTCP
-		corr.getBBTCP().envoyerTchao(dernierCo());
-		corr.getBBTCP().terminerConnexion(false);
-		System.out.println("IR : (ext) connexion terminée avec "+pseudo);
-	    } else { //on envoie tchaoMessage sur l'InetAddress du Correspondant
-		envoyerUDP(corr.getInetAddress(), secretaire_.construireTchaoMessage(dernierCo()));
-		System.out.println("IR : (ext) tchao UDP envoyé à "+pseudo);
-	    }
-	    setDernierCo(false);
-	}
-	annuaire_.clear();
-	System.out.println("IR : ANNUAIRE VIDÉ, CONNEXIONS FERMÉES");
-	printAnnuaire();
 
-	//on termine le UDPTalk
-	udpTalk_.terminer();
-		
-	termine_=true;
-    }
+    /* fonction pour appelée par le Controller
+     * quand l'utilisateur ferme le programme. Elle
+     * permet de quitter le réseau proprement
+     * (informer, terminer les threads d'écoute, 
+     * terminer les connexions, fermer les sockets)
+     */
+    public abstract void extinction();
 
 
     /*public static class CorrespondantException extends Exception {
@@ -353,7 +288,7 @@ public class InterfaceReseau {
 	    System.out.println(s);
 	}
 	}*/
-    private static class Correspondant {
+    static class Correspondant {
 	//vrai si il y a une connexion établie avec le client (blablaTCP valide)
 	private boolean coEtablie_;
 	private InetAddress address_;
@@ -406,33 +341,7 @@ public class InterfaceReseau {
     }
 
 
-    /*cette classe est utile pour paraméter l'envoi des hello.
-      Si on n'a pas reçu de welcome au bout de 3 secondes, on 
-      considère que l'on est le premier connecté*/
-    private static class TTHello extends TimerTask {
-	private int secondes_=0;
-	private InterfaceReseau ir_;
-	public TTHello(InterfaceReseau ir) {
-	    super();
-	    ir_=ir;
-	}
-	public void run() {
-	    secondes_++;
-	    System.out.println("TTHello secondes : "+secondes_);
-	    if (ir_.isCo()) {
-		//si ir connecté on arrête la timer task
-		System.out.println("TTHello s'arrête car on est co");
-		cancel();
-	    }
-	    if (secondes_>2) {
-		//on considère qu'on est les premiers connectés
-		//on se set connecté et on arrête la timer task
-		System.out.println("TTHello passe ir en co : on est les premiers co");
-		ir_.setCo();
-		cancel();
-	    }
-	}
-    }
+ 
 		
 
  

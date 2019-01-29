@@ -9,8 +9,6 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Date;
@@ -20,72 +18,59 @@ import javax.swing.DefaultListModel;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JList;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.SwingConstants;
 import javax.swing.JButton;
-//import java.awt.GridLayout;
+import java.awt.GridLayout;
 import javax.swing.JTextField;
 import javax.swing.JTextArea;
-import java.awt.Insets;
-//import javax.swing.BoxLayout;
-//import java.awt.SystemColor;
+import javax.swing.BoxLayout;
 
-public class Connecte implements ActionListener, MouseListener, KeyListener {
-	private JFrame frmConnecte;
+public class Chat implements ActionListener, MouseListener, KeyListener{
+
+	private JFrame frmChat;
 	int nbCo;
 	private String login;
 	private ArrayList<String> ListCo;
 	private JTextField textField;
 	private String recepteur;
-	//private ArrayList<JTextArea> tabTextArea = new ArrayList<JTextArea>();
-	//private int j=0;
+	private BDD connexion;
+	private ArrayList<JTextArea> tabTextArea = new ArrayList<JTextArea>();
+	private int j=0;
 	ArrayList<String> l_messages; 
 	JTextArea TextArea;
-	JPanel panel_1;
-	JLabel lblNewLabel_3;
-	JPanel panel_3;
 	JPanel panel_4;
-	JList list;
-	Controller ctrl;
-	DefaultListModel listModel;
-	JLabel lblNewLabel_1;
 	
-	public Connecte(String log, Controller controller) {
-		ctrl=controller;
+	
+	
+	public Chat(String log, String recept) throws ParseException {
 		login = log;
+		Controller ctrl = new Controller(8000, 8000);
 		ListCo = ctrl.getListeCo();
 		System.out.println(ListCo);
 		nbCo = ListCo.size();
-		//connexion
+		recepteur = recept;
+		connexion = new BDD("Clavard.db");
+        connexion.connect();
 		initialize();
 	}
 	
 	
-	public void initialize() {
-		frmConnecte = new JFrame();
-		frmConnecte.getContentPane().setBackground(new Color(0, 0, 51));
-		frmConnecte.setForeground(new Color(0, 0, 0));
-		frmConnecte.setBackground(new Color(0, 0, 0));
-		frmConnecte.setBounds(100, 100, 1080, 720);
-		frmConnecte.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		frmConnecte.addWindowListener(new WindowAdapter(){
-		    @Override
-		    public void windowClosing(WindowEvent e)
-		    {
-		        super.windowClosing(e);
-		        // Do your disconnect from the DB here.
-		        ctrl.fermer();
-		    }
-		});
-		frmConnecte.getContentPane().setLayout(null);
+	public void initialize() throws ParseException {
+		frmChat = new JFrame();
+		frmChat.getContentPane().setBackground(new Color(0, 0, 51));
+		frmChat.setForeground(new Color(0, 0, 0));
+		frmChat.setBackground(new Color(0, 0, 0));
+		frmChat.setBounds(100, 100, 1080, 720);
+		frmChat.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		frmChat.getContentPane().setLayout(null);
 		
 		JPanel panel = new JPanel();
 		panel.setBorder(null);
 		panel.setBackground(new Color(0, 0, 128));
 		panel.setBounds(833, 0, 229, 673);
-		frmConnecte.getContentPane().add(panel);
+		frmChat.getContentPane().add(panel);
 		panel.setLayout(null);
 		
 		JLabel lblNewLabel = new JLabel("Connect�(s) : "+nbCo);
@@ -103,29 +88,18 @@ public class Connecte implements ActionListener, MouseListener, KeyListener {
 		JScrollPane scrollPane = new JScrollPane();
 		scrollPane.setBounds(0, 0, 228, 458);
 		scrollPane.setBorder(null);
-		listModel = new DefaultListModel();
-		list = new JList(listModel);
+		DefaultListModel listModel = new DefaultListModel();
+		JList list = new JList(listModel);
 		list.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
 		list.setFont(new Font("Trebuchet MS", Font.PLAIN, 17));
 		list.setBorder(null);
 		list.setBackground(new Color(0, 0, 128));
 		list.setForeground(Color.WHITE);
 		
-		/*for(int k=0;k<25;k++) {
-			listModel.addElement("test");
-
-		}*/
-		
 		
 		for(String i : ListCo) {
-			
-			//tabLabel.set(j,new JLabel(i)) ;
-			//tabLabel.get(j).setForeground(Color.WHITE);
-			//listModel.addElement(tabLabel.get(j));
+						
 			listModel.addElement(i);
-			
-			//j++;
-			// EST-CE QUE JE DEVRAIS GARDER LE TABLEAU DE VARIABLE ?
 			
 		}
 		panel_2.setLayout(null);
@@ -139,29 +113,20 @@ public class Connecte implements ActionListener, MouseListener, KeyListener {
 		
 		
 		
-		panel_1 = new JPanel();
-		panel_1.setBorder(null);//ajout dans bdd
-		//appeler append connecte
+		JPanel panel_1 = new JPanel();
+		panel_1.setBorder(null);
 		panel_1.setBackground(new Color(0, 0, 205));
 		panel_1.setBounds(0, 0, 835, 673);
-		frmConnecte.getContentPane().add(panel_1);
+		frmChat.getContentPane().add(panel_1);
 		panel_1.setLayout(null);
 		
-		lblNewLabel_1 = new JLabel("Bonjour "+login+" !");
+		JLabel lblNewLabel_1 = new JLabel("Bonjour "+login+" !");
 		lblNewLabel_1.setForeground(Color.WHITE);
 		lblNewLabel_1.setFont(new Font("Book Antiqua", Font.PLAIN, 18));
 		lblNewLabel_1.setBounds(22, 13, 301, 23);
 		panel_1.add(lblNewLabel_1);
 		
-		lblNewLabel_3 = new JLabel();
-		lblNewLabel_3.setBackground(Color.LIGHT_GRAY);
-		lblNewLabel_3.setForeground(Color.WHITE);
-		lblNewLabel_3.setFont(new Font("Book Antiqua", Font.PLAIN, 17));
-		lblNewLabel_3.setBounds(282, 65, 306, 33);
-		panel_1.add(lblNewLabel_3);
-		lblNewLabel_3.setVisible(false);
-		
-		panel_3 = new JPanel();
+		JPanel panel_3 = new JPanel();
 		panel_3.setBackground(new Color(0, 0, 205));
 		panel_3.setBounds(62, 124, 773, 517);
 		panel_1.add(panel_3);
@@ -177,8 +142,6 @@ public class Connecte implements ActionListener, MouseListener, KeyListener {
 		panel_3.add(scrollPane_1);
 		
 		textField = new JTextField();
-		textField.setMargin(new Insets(2, 10, 2, 2));
-		textField.setBorder(null);
 		scrollPane_1.setViewportView(textField);
 		textField.addKeyListener(this);
 		textField.setColumns(10);
@@ -191,54 +154,12 @@ public class Connecte implements ActionListener, MouseListener, KeyListener {
 				
 		
 		TextArea = new JTextArea();
-		TextArea.setBorder(null);
-		TextArea.setFont(new Font("Nirmala UI", Font.PLAIN, 14));
-		TextArea.setBackground(new Color(240, 240, 240));
 		TextArea.setEditable(false);
 		JScrollPane scroll = new JScrollPane(TextArea);
-		scroll.setBounds(12, 13, 696, 357);
 		
 		
-		
-		
-		scroll.setViewportView(TextArea);
-		panel_4.add(scroll);
-		
-		JButton btnChangerDePseudo = new JButton("Changer de pseudo");
-		btnChangerDePseudo.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				JOptionPane jop = new JOptionPane();
-			    login = jop.showInputDialog(null, "Votre nouveau pseudo ?", "Changer pseudo", JOptionPane.QUESTION_MESSAGE);
-			    lblNewLabel_1.setText("Bonjour "+login+" !");
-			    ctrl.changementPseudo(login);
-			}
-		});
-		btnChangerDePseudo.setBackground(Color.LIGHT_GRAY);
-		btnChangerDePseudo.setFont(new Font("Source Sans Pro Semibold", Font.PLAIN, 15));
-		btnChangerDePseudo.setBounds(625, 30, 161, 44);
-		panel_1.add(btnChangerDePseudo);
-		panel_3.setVisible(false);
-		
-		frmConnecte.setTitle("Connect�");
-		frmConnecte.setVisible(true);
-	}
-	
-	/* methode appel�e quand un user se connecte
-	 * ou se deconnecte
-	 */
-	public void majListeCo() {
-		ListCo = ctrl.getListeCo();
-		listModel = new DefaultListModel();
-		for(String i : ListCo) {
-			listModel.addElement(i);
-		}
-		list.setModel(listModel);
-	}
-
-	public void afficheChat() throws ParseException {
-		TextArea.setText("");
 		l_messages = new ArrayList<String>();
-		ArrayList<Message> liste_bdd = ctrl.lireBDD(login, recepteur);
+		ArrayList<Message> liste_bdd = connexion.lire_mess(login, recepteur);
 		for (Message obj : liste_bdd) {
 			if(obj.emetteur.equals(login)) {
 				l_messages.add("Moi : "+obj.contenu);
@@ -264,67 +185,83 @@ public class Connecte implements ActionListener, MouseListener, KeyListener {
 			    TextArea.append(str+"\n");
 			//scrollPane_2.add(tabTextArea.get(j), j);
 			     TextArea.setBounds(12, 13, 696, 357);
-			     
+			     panel_4.add(TextArea);
 			
 
-			//j++;
+			j++;
 		}
 		
-		lblNewLabel_3.setText("Discussion avec "+recepteur);
-		lblNewLabel_3.setVisible(true);
-		panel_3.setVisible(true);
+		
+		panel_4.add(scroll);
+		
+		
+		JLabel lblNewLabel_3 = new JLabel("Discussion avec "+recepteur);
+		lblNewLabel_3.setBackground(Color.LIGHT_GRAY);
+		lblNewLabel_3.setForeground(Color.WHITE);
+		lblNewLabel_3.setFont(new Font("Book Antiqua", Font.PLAIN, 17));
+		lblNewLabel_3.setBounds(282, 65, 306, 33);
+		panel_1.add(lblNewLabel_3);
+		frmChat.setTitle("Chat");
+		frmChat.setVisible(true);
 		
 		
 		
 	}
+	
 
-   
+	public void afficherChat() throws ParseException {
+		/* ArrayList<Message> liste_envoyes;
+		ArrayList<Message> liste_recus;
+		l_messages = new ArrayList<String>();
+		liste_envoyes = connexion.lire_mess(login, recepteur);
+		for (Message obj : liste_envoyes) {
+			
+			//listModel.addElement(tabLabel.get(j));
+			l_messages.add("Moi : "+obj.contenu);
+		}
+		
+		liste_recus = connexion.lire_mess(recepteur, login);
+		System.out.println(liste_recus);
+		for (Message mess : liste_recus) {
+			l_messages.add(recepteur+" : "+mess.contenu);
+		}
+		
+		for (String str : l_messages) {
+			System.out.println(str);
+			/*tabTextArea.add(new JTextArea(str)) ;
+			tabTextArea.get(j).setEditable(false);*/
+			
+			//tabTextArea.get(j).setForeground(Color.WHITE);
+			//tabTextArea.get(j).setText(str);
+			
+		//	    TextArea.append(str+"\n");
+			//scrollPane_2.add(tabTextArea.get(j), j);
+		//	     TextArea.setBounds(12, 13, 696, 357);
+		//	panel_4.add(TextArea);
+			
+
+		//	j++;
+	//	}
+		// QUAND IL Y A // BIEN AVANT LE TEXTE C'EST QUE CA FAIT PARTI DU CODE (ECLIPSE A PAS G�R� LES COMMENTAIRES)
+	}
+
+
+	
 	public void envoi(String mess) {
-		/*Ecriture dans la base de donn�es et refresh ?
+		/*�criture dans la base de donn�es et refresh ?
 		 �crire BDD */
 		if(mess.isEmpty()) {
 		}
 		else {
 		Date date=new Date();
-		ctrl.ecrireBDD(login, recepteur, date, mess);
+		connexion.ecrire(login, recepteur, date, mess);
 		TextArea.append("Moi : "+mess+"\n");
 		textField.setText("");
-		
-		ctrl.envoyerMessage(recepteur, mess);
 		
 		//connexion.close();
 		}
 	}
-	
-	/* si on veut rajouter des notifs, le faire ici */
-	public void ajoutMessageRecu(String pseudoEmetteur, String message) {
-		try {
-		if (recepteur.equals(pseudoEmetteur)) {
-			System.out.println(recepteur+"     "+pseudoEmetteur);
-			TextArea.append(recepteur+" : "+message+"\n");
-		}
-		} catch (NullPointerException e) {
-			System.out.println("Connecte : La fen�tre de discussion ouverte ne correspond pas au r�c�pteur du message re�u");
-			recepteur=pseudoEmetteur;
-			try {
-				afficheChat();
-			} catch (ParseException e1) {
-				e1.printStackTrace();
-			}
-		}
-		
-	}
-	
-	public void cacherChat() {
-		panel_3.setVisible(false);
-		recepteur=null;
-	}
    
-	public String getRecepteur() {
-		return recepteur;
-	}
-
-
 	@Override
 	public void actionPerformed(ActionEvent arg0) {
 		// TODO Auto-generated method stub
@@ -361,7 +298,13 @@ public class Connecte implements ActionListener, MouseListener, KeyListener {
 	}
 
 
-
+	@Override
+	public void mouseClicked(MouseEvent e) {
+		// TODO Auto-generated method stub
+		 if (e.getClickCount() == 2) {
+	        	//frmChat.setVisible(false);
+	        }
+	}
 
 
 	@Override
@@ -384,21 +327,5 @@ public class Connecte implements ActionListener, MouseListener, KeyListener {
 	public void keyTyped(KeyEvent arg0) {
 		// TODO Auto-generated method stub
 		
-	}
-
-	@Override
-	public void mouseClicked(MouseEvent e) {
-		// TODO Auto-generated method stub
-		
-		 if (e.getClickCount() == 2) {
-			 recepteur = (String) list.getSelectedValue();
-			 try {
-				 //panel_3.setVisible(false);
-				afficheChat();
-			} catch (ParseException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
-			}
-	        }
 	}
 }

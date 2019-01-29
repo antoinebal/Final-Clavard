@@ -40,13 +40,9 @@ public class UDPTalk {
 	    //String response = new String(inPacket.getData(), 0, inPacket.getLength());
 	    //System.out.println(response);
 	    //dgramSocket_.close();
-	} catch(SocketException e) {
-	    System.out.println("PB dans startUDPTalk.");
+	} catch(Exception e) {
 	    e.printStackTrace();
-	} catch(IOException e) {
-	    System.out.println("PB dans startUDPTalk.");
-	    e.printStackTrace();
-	}
+	} 
     }
 
 
@@ -66,13 +62,9 @@ public class UDPTalk {
 	    String response = new String(inPacket.getData(), 0, inPacket.getLength());
 	    System.out.println("UDPTalk : ACK reçu : "+response);*/
 	    //dgramSocket_.close();
-	} catch(SocketException e) {
-	    System.out.println("PB dans startUDPTalk.");
+	} catch(Exception e) {
 	    e.printStackTrace();
-	} catch(IOException e) {
-	    System.out.println("PB dans startUDPTalk.");
-	    e.printStackTrace();
-	}
+	} 
     }
 
     /*fonction appelée quand on éteint l'IR.

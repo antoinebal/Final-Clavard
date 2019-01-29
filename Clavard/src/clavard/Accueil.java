@@ -24,6 +24,10 @@ public class Accueil implements ActionListener, KeyListener{
 	private JTextField txtVeuillezVousIdentifier;
 	private String log;
 	private JLabel lblLePseudoNe;
+	//l'application fonctionne en local par défaut
+	private boolean isLocal_=true;
+	
+	JRadioButton rdbtnLocal;
 	
 	
 	
@@ -107,7 +111,7 @@ public class Accueil implements ActionListener, KeyListener{
 		lblLePseudoNe.setVisible(false);
 		frmAccueil.getContentPane().add(lblLePseudoNe);
 		
-		JRadioButton rdbtnLocal = new JRadioButton("Local");
+		rdbtnLocal = new JRadioButton("Local");
 		rdbtnLocal.setFont(new Font("Source Sans Pro", Font.PLAIN, 18));
 		rdbtnLocal.setForeground(Color.WHITE);
 		rdbtnLocal.setBackground(new Color(0,0, 51));
@@ -163,4 +167,11 @@ public class Accueil implements ActionListener, KeyListener{
 	
 	@Override
 	public void keyReleased(KeyEvent ke) {}
+	
+	public boolean isLocal() {return  rdbtnLocal.isSelected();}
+	
+	public static void main(String[] args) {
+		new Controller(6002, 5002);
+	}
+	
 }

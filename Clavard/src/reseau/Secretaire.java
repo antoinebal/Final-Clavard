@@ -88,6 +88,10 @@ public class Secretaire {
 	    String pseudo=message.split(":")[0];
 	    System.out.println("Secrétaire : "+message+" est un message Welcome de "+pseudo+".");
 	    traiteWelcomeMessage(message);
+	} else if (Pattern.matches(".+:newuser:.+:.+", message)) {
+		String pseudo=message.split(":")[0];
+		System.out.println("Secrétaire : "+message+" est un message newuser de "+pseudo+".");
+		traiteNewUserMessage(message);
 	} else {
 	    System.out.println("Secrétaire : "+message+" est non conforme.");
 	}
@@ -100,6 +104,18 @@ public class Secretaire {
 	} else {
 	    return pseudo+tail;
 	}
+    }
+    
+    public void traiteNewUserMessage(String newUserMsg) {
+    	String pseudo=newUserMsg.split(":")[0];
+		try {
+			InetAddress address=InetAddress.getByName(newUserMsg.split(":")[2]);
+			int port=Integer.parseInt(newUserMsg.split(":")[3]);
+			ir_.nouveauCorrespondant(pseudo, address, port);
+			ir_.printAnnuaire();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
     }
 
 
@@ -160,7 +176,7 @@ public class Secretaire {
 		String[] secondSplit = firstSplit[NO].split(";");
 		String pseudo = secondSplit[0];
 		InetAddress address = InetAddress.getByName(secondSplit[1]);
-		int port = Integer.parseInt(secondSplit[2]);
+		int port = Integer.parseInt(secondSplit[2].trim());
 		System.out.println(pseudo+" ; "+secondSplit[1]+" ; "+port);
 		ir_.nouveauCorrespondant(pseudo, address, port);
 	    }
@@ -193,7 +209,7 @@ public class Secretaire {
 
     /* on informe l'IR de ce changement, qui va 
        > lever une exception si le pseudo existe déjà
-       > lever une exception si l'ancien pseudo n'existe pas
+       > lever une exception si l'ancien spseudo n'existe pas
        > changer l'annuaire
        > informer le controller. */
     public void traiteNewPseudoMessage(String newPseudoMsg) {
@@ -223,11 +239,11 @@ public class Secretaire {
 	s.traiteMessage("nualia:tcho");*/
 
 	
-	Secretaire s = new Secretaire(new InterfaceReseau("maure"));
+	//Secretaire s = new Secretaire(new InterfaceReseau("maure"));
 	//s.traiteMessage(null,0,"maure:hello");
 	//s.traiteMessage(null,0,"mazak:hello:5000");
-	String welcomeMsg = "maure:mazak0:welcome:mazak;255.255.255.255;5000:nualia;255.255.255.255;5001:derol;255.255.255.255;5000:drassius;255.255.255.255;5000";
-	s.traiteMessage(null,0,welcomeMsg);
+	//String welcomeMsg = "maure:mazak0:welcome:mazak;255.255.255.255;5000:nualia;255.255.255.255;5001:derol;255.255.255.255;5000:drassius;255.255.255.255;5000";
+	//s.traiteMessage(null,0,welcomeMsg);
 	/*s.traiteWelcomeMessage(welcomeMsg);
 	System.out.println("Testhello");
 	s.traiteHelloMessage("maure:hello", null);*/
