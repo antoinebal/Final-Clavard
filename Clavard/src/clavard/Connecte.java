@@ -224,10 +224,15 @@ public class Connecte implements ActionListener, MouseListener, KeyListener {
 		panel_1.add(btnChangerDePseudo);
 		panel_3.setVisible(false);
 		
-		frmConnecte.setTitle("Connect�");
+		frmConnecte.setTitle("Connecté");
 		frmConnecte.setVisible(true);
 	}
 	
+	public void setRecepteur(String recepteur) {
+		this.recepteur = recepteur;
+	}
+
+
 	/* methode appel�e quand un user se connecte
 	 * ou se deconnecte
 	 */
@@ -268,13 +273,13 @@ public class Connecte implements ActionListener, MouseListener, KeyListener {
 			
 			    TextArea.append(str+"\n");
 			//scrollPane_2.add(tabTextArea.get(j), j);
-			     TextArea.setBounds(12, 13, 696, 357);
+			     
 			     
 			
 
 			//j++;
 		}
-		
+		TextArea.setBounds(12, 13, 696, 357);
 		lblNewLabel_3.setText("Discussion avec "+recepteur);
 		if(!panel_3.isVisible()) {
 			panel_3.setVisible(true);

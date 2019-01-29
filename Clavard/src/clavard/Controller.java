@@ -165,6 +165,13 @@ public class Controller {
 		ListeCo.remove(previousPseudo);
 		ListeCo.add(newPseudo);
 		fenetreCo_.majListeCo();
+		fenetreCo_.setRecepteur(newPseudo);
+		try {
+			fenetreCo_.afficheChat();
+		} catch (ParseException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 	
 	public void changementPseudo(String newPseudo) {
