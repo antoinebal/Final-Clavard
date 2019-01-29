@@ -29,11 +29,13 @@ public class Accueil implements ActionListener, KeyListener{
 	
 	JRadioButton rdbtnLocal;
 	
+	/**
+	 * Launch the application.
+	 * @wbp.parser.entryPoint
+	 */
 	
 	
-	public String getLog() {
-		return log;
-	}
+	
 
 	public Accueil() {
 		initialize();
@@ -80,9 +82,9 @@ public class Accueil implements ActionListener, KeyListener{
 		txtBienvenueSurVotre.setEditable(false);
 		txtBienvenueSurVotre.setForeground(new Color(255, 255, 0));
 		txtBienvenueSurVotre.setBackground(new Color(0, 0, 51));
-		txtBienvenueSurVotre.setFont(new Font("Source Sans Pro", Font.BOLD, 36));
+		txtBienvenueSurVotre.setFont(new Font("Dialog", Font.BOLD, 31));
 		txtBienvenueSurVotre.setText("Bienvenue sur votre plateforme de clavardage");
-		txtBienvenueSurVotre.setBounds(141, 58, 755, 133);
+		txtBienvenueSurVotre.setBounds(141, 58, 834, 133);
 		frmAccueil.getContentPane().add(txtBienvenueSurVotre);
 		txtBienvenueSurVotre.setColumns(10);
 		
@@ -93,12 +95,12 @@ public class Accueil implements ActionListener, KeyListener{
 		txtVeuillezVousIdentifier.setForeground(Color.WHITE);
 		txtVeuillezVousIdentifier.setBackground(new Color(0, 0, 51));
 		txtVeuillezVousIdentifier.setText("Veuillez vous identifier");
-		txtVeuillezVousIdentifier.setBounds(403, 228, 228, 28);
+		txtVeuillezVousIdentifier.setBounds(403, 226, 247, 28);
 		frmAccueil.getContentPane().add(txtVeuillezVousIdentifier);
 		txtVeuillezVousIdentifier.setColumns(10);
 		
 		JButton btnConnexion = new JButton("Connexion");
-		btnConnexion.setBounds(701, 409, 97, 25);
+		btnConnexion.setBounds(701, 409, 118, 25);
 		btnConnexion.addActionListener(this);
 		//btnConnexion.getInputMap().pu
 		//btnConnexion.getInputMap().put(java.awt.event.KeyEvent.VK_ENTER, arg1);
@@ -107,7 +109,7 @@ public class Accueil implements ActionListener, KeyListener{
 		lblLePseudoNe = new JLabel("Le pseudo ne doit ni \u00EAtre vide ni contenir de \":\" ou de \";\" !");
 		lblLePseudoNe.setFont(new Font("Tahoma", Font.PLAIN, 18));
 		lblLePseudoNe.setForeground(Color.RED);
-		lblLePseudoNe.setBounds(301, 481, 471, 48);
+		lblLePseudoNe.setBounds(283, 482, 536, 48);
 		lblLePseudoNe.setVisible(false);
 		frmAccueil.getContentPane().add(lblLePseudoNe);
 		
@@ -123,7 +125,7 @@ public class Accueil implements ActionListener, KeyListener{
 		rdbtnEnLigne.setFont(new Font("Source Sans Pro", Font.PLAIN, 18));
 		rdbtnEnLigne.setForeground(Color.WHITE);
 		rdbtnEnLigne.setBackground(new Color(0,0, 51));
-		rdbtnEnLigne.setBounds(681, 322, 91, 25);
+		rdbtnEnLigne.setBounds(681, 322, 117, 25);
 		frmAccueil.getContentPane().add(rdbtnEnLigne);
 		
 		ButtonGroup group = new ButtonGroup();
@@ -137,7 +139,9 @@ public class Accueil implements ActionListener, KeyListener{
 	}
 
 
-	
+	public String getLog() {
+		return log;
+	}
 	public void action() {
 		log = this.txtfield.getText();
 		if (log.contains(":") || log.contains(";") || log.isEmpty()){

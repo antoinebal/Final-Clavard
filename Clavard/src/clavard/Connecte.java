@@ -68,7 +68,7 @@ public class Connecte implements ActionListener, MouseListener, KeyListener {
 		frmConnecte.getContentPane().setBackground(new Color(0, 0, 51));
 		frmConnecte.setForeground(new Color(0, 0, 0));
 		frmConnecte.setBackground(new Color(0, 0, 0));
-		frmConnecte.setBounds(100, 100, 1080, 720);
+		frmConnecte.setBounds(100, 100, 1062, 698);
 		frmConnecte.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frmConnecte.addWindowListener(new WindowAdapter(){
 		    @Override
@@ -88,13 +88,12 @@ public class Connecte implements ActionListener, MouseListener, KeyListener {
 		frmConnecte.getContentPane().add(panel);
 		panel.setLayout(null);
 		
-		JLabel lblNewLabel = new JLabel("Connect�(s) : "+nbCo);
-		lblNewLabel.setBounds(56, 103, 130, 23);
+		JLabel lblNewLabel = new JLabel("Connecté(s) : "+nbCo);
+		lblNewLabel.setBounds(34, 103, 170, 23);
 		lblNewLabel.setFont(new Font("Book Antiqua", Font.BOLD, 18));
 		lblNewLabel.setForeground(Color.WHITE);
 		lblNewLabel.setBackground(new Color(0, 0, 0));
 		panel.add(lblNewLabel);
-		
 		JPanel panel_2 = new JPanel();
 		panel_2.setBackground(new Color(0, 0, 128));
 		panel_2.setBounds(0, 215, 228, 458);
@@ -157,9 +156,9 @@ public class Connecte implements ActionListener, MouseListener, KeyListener {
 		lblNewLabel_3.setBackground(Color.LIGHT_GRAY);
 		lblNewLabel_3.setForeground(Color.WHITE);
 		lblNewLabel_3.setFont(new Font("Book Antiqua", Font.PLAIN, 17));
-		lblNewLabel_3.setBounds(282, 65, 306, 33);
+		lblNewLabel_3.setBounds(274, 65, 306, 33);
 		panel_1.add(lblNewLabel_3);
-		lblNewLabel_3.setVisible(false);
+		//lblNewLabel_3.setVisible(false);
 		
 		panel_3 = new JPanel();
 		panel_3.setBackground(new Color(0, 0, 205));
@@ -168,12 +167,12 @@ public class Connecte implements ActionListener, MouseListener, KeyListener {
 		panel_3.setLayout(null);
 		
 		JButton btnEnvoyer = new JButton("Envoyer");
-		btnEnvoyer.setBounds(637, 400, 97, 25);
+		btnEnvoyer.setBounds(636, 408, 97, 25);
 		btnEnvoyer.addActionListener(this);
 		panel_3.add(btnEnvoyer);
 		
 		JScrollPane scrollPane_1 = new JScrollPane();
-		scrollPane_1.setBounds(12, 400, 597, 38);
+		scrollPane_1.setBounds(12, 408, 597, 38);
 		panel_3.add(scrollPane_1);
 		
 		textField = new JTextField();
@@ -184,7 +183,7 @@ public class Connecte implements ActionListener, MouseListener, KeyListener {
 		textField.setColumns(10);
 		
 		panel_4 = new JPanel();
-		panel_4.setBounds(12, 0, 720, 383);
+		panel_4.setBounds(12, 12, 720, 383);
 		panel_3.add(panel_4);
 		panel_4.setLayout(null);
 		
@@ -208,8 +207,21 @@ public class Connecte implements ActionListener, MouseListener, KeyListener {
 		btnChangerDePseudo.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				JOptionPane jop = new JOptionPane();
-			    String testnewpseudo = jop.showInputDialog(null, "Votre nouveau pseudo ? (Pas de \":\" ou de \";\")" , "Changer pseudo", JOptionPane.QUESTION_MESSAGE);
-			    if (testnewpseudo.contains(":") || testnewpseudo.contains(";") || testnewpseudo.isEmpty()) {
+			    String testnewpseudo = jop.showInputDialog(null, "Votre nouveau pseudo ? (Pas de \":\" ou de \";\" ni un déjà existant)" , "Changer pseudo", JOptionPane.QUESTION_MESSAGE);
+			    
+			   
+			    ListCo = ctrl.getListeCo();
+			    Boolean existedeja = false;
+			    for (String testeur : ListCo) {
+			    	if(testnewpseudo.equals(testeur))
+			    	{
+			    		existedeja=true;
+			    	}
+			    	
+			    }
+			    
+			    
+			    if (testnewpseudo.contains(":") || testnewpseudo.contains(";") || testnewpseudo.isEmpty() || existedeja) {
 			    }
 			    else {
 			    	login=testnewpseudo;
@@ -219,8 +231,8 @@ public class Connecte implements ActionListener, MouseListener, KeyListener {
 			}
 		});
 		btnChangerDePseudo.setBackground(Color.LIGHT_GRAY);
-		btnChangerDePseudo.setFont(new Font("Source Sans Pro Semibold", Font.PLAIN, 15));
-		btnChangerDePseudo.setBounds(625, 30, 161, 44);
+		btnChangerDePseudo.setFont(new Font("DejaVu Serif Condensed", Font.PLAIN, 15));
+		btnChangerDePseudo.setBounds(606, 30, 180, 44);
 		panel_1.add(btnChangerDePseudo);
 		panel_3.setVisible(false);
 		
