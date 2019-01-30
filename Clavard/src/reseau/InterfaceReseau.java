@@ -2,10 +2,12 @@ package reseau;
 
 import java.util.Map;
 import java.util.Scanner;
+
+import core.Controller;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.net.InetAddress;
-import clavard.Controller;
 
 
 public abstract class InterfaceReseau {

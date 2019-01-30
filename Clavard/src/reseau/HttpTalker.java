@@ -7,9 +7,6 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.Scanner;
-
-import clavard.Controller;
 
 public class HttpTalker {
 	
@@ -21,8 +18,8 @@ public class HttpTalker {
 		aw_=aw;
 	}
 	
-    /*envoie requÃªte http au serveur, retourne la liste des connectÃ©s
-     * envoyÃ©e par le serveur
+    /*envoie requête http au serveur, retourne la liste des connectés
+     * envoyée par le serveur
      */
     public String subscribe() {
         URL url = construitURL(true, false, null);
@@ -34,13 +31,13 @@ public class HttpTalker {
     	envoyerRequete(url);
     }
     
-    /* Ã  appeler quand l'user change de pseudo */
+    /* à appeler quand l'user change de pseudo */
     public void notifyNewPseudo(String newPseudo) {
     	URL url = construitURL(false, false, newPseudo);
     	envoyerRequete(url);
     }
     
-    /* construit l'url en fonction des paramÃ¨tres */
+    /* construit l'url en fonction des paramètres */
     public URL construitURL(boolean co, boolean deco, String newpseudo) {
         String stringUrl = "http://"+ADRESSE_IP_SERVEUR_TOMCAT+":8080/clavard-serveur/ClavardServlet?pseudo="+aw_.getPseudo();
         if (co) {
@@ -70,10 +67,10 @@ public class HttpTalker {
              //on n'utilise pas le cache
              connexion.setUseCaches(false);
              
-             //on rÃ¨gle la connexion en output
+             //on règle la connexion en output
              connexion.setDoOutput(true);
              
-             //on attend une rÃ©ponse
+             //on attend une réponse
              InputStream in = connexion.getInputStream();
              BufferedReader buffReader = new BufferedReader(new InputStreamReader(in));
              StringBuilder response = new StringBuilder();
@@ -82,7 +79,7 @@ public class HttpTalker {
                  response.append(line);
                  response.append('\r');
              }
-             System.out.println("Message reÃ§u : "+response.toString());
+             System.out.println("Message reçu : "+response.toString());
              buffReader.close();
              return response.toString();
          } catch (IOException e) {

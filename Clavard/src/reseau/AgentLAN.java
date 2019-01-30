@@ -5,7 +5,7 @@ import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import clavard.Controller;
+import core.Controller;
 
 public class AgentLAN extends InterfaceReseau {
 

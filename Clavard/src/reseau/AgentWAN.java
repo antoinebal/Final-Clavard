@@ -1,13 +1,10 @@
 package reseau;
 
 
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.Map;
-import java.util.Scanner;
 
-import clavard.Controller;
-import reseau.InterfaceReseau.Correspondant;
+import java.util.Map;
+
+import core.Controller;
 
 public class AgentWAN extends InterfaceReseau {
 	private HttpTalker httpTalker_;
@@ -16,14 +13,14 @@ public class AgentWAN extends InterfaceReseau {
 		super(pseudo, portServeur, portUDP, controller);
 		httpTalker_ = new HttpTalker(this);
 		
-		/* on demande au secrÃ©taire de remplir l'annuaire avec la liste
-		 * renvoyÃ©e par le serveur
+		/* on demande au secrétaire de remplir l'annuaire avec la liste
+		 * renvoyée par le serveur
 		 */
 		secretaire_.traiteWelcomeMessage(httpTalker_.subscribe());
 		
-		/* on se passe connectÃ©, ce qui est le signal
-		 * pour que le controller puisse rÃ©cupÃ©rer la liste des
-		 * connectÃ©s
+		/* on se passe connecté, ce qui est le signal
+		 * pour que le controller puisse récupérer la liste des
+		 * connectés
 		 */
 		connected_=true;
 			
@@ -32,10 +29,10 @@ public class AgentWAN extends InterfaceReseau {
 
 	@Override
 	public void informerNewPseudo(String newPseudo) {
-		//on envoie la requÃªte au serveur
+		//on envoie la requête au serveur
 		httpTalker_.notifyNewPseudo(newPseudo);
 		
-		//on change le pseudo enregistrÃ© localement
+		//on change le pseudo enregistré localement
 		pseudo_=newPseudo;
 	}
 
@@ -48,60 +45,24 @@ public class AgentWAN extends InterfaceReseau {
 		    Correspondant corr = entry.getValue();
 		    if (corr.coEtablie()) { //on termine les connexions BlablaTCP
 			corr.getBBTCP().envoyerTchao(false);
-			//argument faux car appelÃ© depuis agent wan
+			//argument faux car appelé depuis agent wan
 			corr.getBBTCP().terminerConnexion(false);
-			System.out.println("AgentWAN : (ext) connexion terminÃ©e avec "+pseudo);
+			System.out.println("AgentWAN : (ext) connexion terminée avec "+pseudo);
 		    }
 		}
 		
 		annuaire_.clear();
-		System.out.println("AW : ANNUAIRE VIDÃ‰, CONNEXIONS FERMÃ‰ES");
+		System.out.println("AW : ANNUAIRE VIDÉ, CONNEXIONS FERMÉES");
 		printAnnuaire();
 		
-		//on envoie une requÃªte GET au serveur avec l'attribut deconnexion Ã  1
+		//on envoie une requête GET au serveur avec l'attribut deconnexion à 1
 		httpTalker_.notifyDeconnexion();
 		
 		termine_=true;	
 	}
 	
 	
-		public static void main(String[] args) {		
-					Scanner scan = new Scanner(System.in);
-					String inputDest=null;
-					String inputMsg=null;
-					String inputNewPseudo=null;
-					try {
-					   Controller cont = new Controller(true);
-					   String pseudo = "maure";
-					   InterfaceReseau ir = new AgentWAN(pseudo, 8002, 6002, cont);		
-					   while(true) {
-					System.out.println("Qui contacter?");
-					if (scan.hasNext()) {
-					    inputDest=scan.nextLine();
-					}
-					if (inputDest.equals("down")) {
-					    ir.extinction();
-					    break;
-					}
-					if (inputDest.equals("switch")) {
-					    System.out.println("Quel nouveau pseudo choisir?");
-					    if (scan.hasNext()) {
-						inputNewPseudo=scan.nextLine();
-					    }
-					    ir.informerNewPseudo(inputNewPseudo);
-					    pseudo=inputNewPseudo;
-					} else {
-					    System.out.println("Quel message envoyer Ã  "+inputDest);
-					    if (scan.hasNext()) {
-						inputMsg=scan.nextLine();
-					   }
-					   ir.envoyerMessage(inputDest, inputMsg);					
-					   }
-				    }
-				} catch (CorrespondantException e) {
-				    e.printStackTrace();
-				}		
-		}
+		
 	
 	
 
