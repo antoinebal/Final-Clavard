@@ -19,7 +19,7 @@ public class AgentWAN extends InterfaceReseau {
 		/* on demande au secrétaire de remplir l'annuaire avec la liste
 		 * renvoyée par le serveur
 		 */
-		secretaire_.traiteWelcomeMessage(httpTalker_.seConnecter());
+		secretaire_.traiteWelcomeMessage(httpTalker_.subscribe());
 		
 		/* on se passe connecté, ce qui est le signal
 		 * pour que le controller puisse récupérer la liste des
@@ -33,7 +33,7 @@ public class AgentWAN extends InterfaceReseau {
 	@Override
 	public void informerNewPseudo(String newPseudo) {
 		//on envoie la requête au serveur
-		httpTalker_.requeteNewPseudo(newPseudo);
+		httpTalker_.notifyNewPseudo(newPseudo);
 		
 		//on change le pseudo enregistré localement
 		pseudo_=newPseudo;
@@ -59,7 +59,7 @@ public class AgentWAN extends InterfaceReseau {
 		printAnnuaire();
 		
 		//on envoie une requête GET au serveur avec l'attribut deconnexion à 1
-		httpTalker_.seDeconnecter();
+		httpTalker_.notifyDeconnexion();
 		
 		termine_=true;	
 	}

@@ -22,7 +22,7 @@ public class UDPListener implements Runnable {
 	System.out.println("UDPListener : lancé");
 	try {
 	    dgramSocket_ = new DatagramSocket(port_);
-	    dgramSocket_.setSoTimeout(60*1000*10); //on laisse un timeout de 5 minutes
+	    dgramSocket_.setSoTimeout(60*1000*10); //on laisse un timeout de 10 minutes
 	    byte[] buffer = new byte[256];
 	    DatagramPacket inPacket = new DatagramPacket(buffer, buffer.length);
 	    while(!ir_.isTermine()) {
@@ -62,8 +62,8 @@ public class UDPListener implements Runnable {
     }
 
     public void termine() {
-	dgramSocket_.close();
-	System.out.println("UDPListener : socket closed");	
+    	dgramSocket_.close();
+    	System.out.println("UDPListener : socket closed");	
     }
 
 
